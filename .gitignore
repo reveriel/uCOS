@@ -1,3 +1,23 @@
+# project
+*.map
+*.d
+*.crf
+*.iex
+*.sct
+*.axf
+*.htm
+*.lnp
+*.uvopt
+*.uvproj
+*.bak
+*.ini
+*.lst
+*.dep
+*.guoxing
+*.txt
+
+
+
 # Object files
 *.o
 *.ko
