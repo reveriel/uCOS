@@ -1,49 +1,49 @@
 #include "stm32f10x.h"
 #include <stdio.h>
-#include "Usart.h"
+#include "usart.h"
 u8 TxBuffer[256];
 u8 TxCounter=0;
 u8 count=0;
 u8 CtrData=0;
 u8 RxBuffer[50];
 static u8 RxState = 0;
-void Usart_Configuration(void)			//ÅäÖÃUsart1 Tx->PA9 Rx->PA10
+void Usart_Configuration(void)			//é…ç½®Usart1 Tx->PA9 Rx->PA10
 {
-	 GPIO_InitTypeDef GPIO_InitStructure; //GPIO¿âº¯Êý½á¹¹Ìå
-	 USART_InitTypeDef USART_InitStructure;//USART¿âº¯Êý½á¹¹Ìå
+	 GPIO_InitTypeDef GPIO_InitStructure; //GPIOåº“å‡½æ•°ç»“æž„ä½“
+	 USART_InitTypeDef USART_InitStructure;//USARTåº“å‡½æ•°ç»“æž„ä½“
 	 USART_ClockInitTypeDef USART_ClockInitStructure;
 	 NVIC_InitTypeDef NVIC_InitStructure;
-	 //Ê¹ÄÜ´®¿Ú1£¬GPIOA£¬AFIO×ÜÏß
+	 //ä½¿èƒ½ä¸²å£1ï¼ŒGPIOAï¼ŒAFIOæ€»çº¿
 	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO|RCC_APB2Periph_USART1,ENABLE);
 
 	 /* Configure USART1 Tx (PA9) as alternate function push-pull */
 	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-	 GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//PA9Ê±ÖÓËÙ¶È50MHz
-	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; //¸´ÓÃÊä³ö
+	 GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//PA9æ—¶é’Ÿé€Ÿåº¦50MHz
+	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; //å¤ç”¨è¾“å‡º
 	 GPIO_Init(GPIOA, &GPIO_InitStructure);
 	 /* Configure USART1 Rx (PA10) as input floating */
 	 GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//ÉÏÀ­ÊäÈë
+	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//ä¸Šæ‹‰è¾“å…¥
 	 GPIO_Init(GPIOA, &GPIO_InitStructure);
 	 
-	 USART_InitStructure.USART_BaudRate =9600; //9600; //²¨ÌØÂÊ115200
-	 USART_InitStructure.USART_WordLength = USART_WordLength_8b; //8Î»Êý¾Ý
-	 USART_InitStructure.USART_StopBits = USART_StopBits_1; //1¸öÍ£Ö¹Î»
-	 USART_InitStructure.USART_Parity = USART_Parity_No; //ÆæÅ¼Ê¹ÄÜ
-	 USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; //Ó²¼þÁ÷¿ØÖÆÊ§ÄÜ
-	 USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; //·¢ËÍ¡¢½ÓÊÕÊ¹ÄÜ
+	 USART_InitStructure.USART_BaudRate =9600; //9600; //æ³¢ç‰¹çŽ‡115200
+	 USART_InitStructure.USART_WordLength = USART_WordLength_8b; //8ä½æ•°æ®
+	 USART_InitStructure.USART_StopBits = USART_StopBits_1; //1ä¸ªåœæ­¢ä½
+	 USART_InitStructure.USART_Parity = USART_Parity_No; //å¥‡å¶ä½¿èƒ½
+	 USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; //ç¡¬ä»¶æµæŽ§åˆ¶å¤±èƒ½
+	 USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; //å‘é€ã€æŽ¥æ”¶ä½¿èƒ½
 	
 	 USART_ClockInitStructure.USART_Clock = USART_Clock_Disable;
-	 USART_ClockInitStructure.USART_CPOL = USART_CPOL_Low;//¿ÕÏÐÊ±ÖÓÎªµÍµçÆ½
-	 USART_ClockInitStructure.USART_CPHA = USART_CPHA_2Edge;//Ê±ÖÓµÚ¶þ¸ö±ßÑØ½øÐÐÊý¾Ý²¶»ñ
-	 USART_ClockInitStructure.USART_LastBit = USART_LastBit_Disable;//×îºóÒ»Î»Êý¾ÝµÄÊ±ÖÓÂö³å²»´ÓSCLKÊä³ö
+	 USART_ClockInitStructure.USART_CPOL = USART_CPOL_Low;//ç©ºé—²æ—¶é’Ÿä¸ºä½Žç”µå¹³
+	 USART_ClockInitStructure.USART_CPHA = USART_CPHA_2Edge;//æ—¶é’Ÿç¬¬äºŒä¸ªè¾¹æ²¿è¿›è¡Œæ•°æ®æ•èŽ·
+	 USART_ClockInitStructure.USART_LastBit = USART_LastBit_Disable;//æœ€åŽä¸€ä½æ•°æ®çš„æ—¶é’Ÿè„‰å†²ä¸ä»ŽSCLKè¾“å‡º
 
-	//Ê¹ÄÜ´®¿Ú1½ÓÊÕÖÐ¶Ï
+	//ä½¿èƒ½ä¸²å£1æŽ¥æ”¶ä¸­æ–­
 	 USART_ITConfig(USART1, USART_IT_RXNE, ENABLE); 
 
 	 USART_ClockInit(USART1, &USART_ClockInitStructure);
-	 USART_Init(USART1, &USART_InitStructure);	//³õÊ¼»¯½á¹¹Ìå
-	 USART_Cmd(USART1, ENABLE); //Ê¹ÄÜ´®¿Ú1
+	 USART_Init(USART1, &USART_InitStructure);	//åˆå§‹åŒ–ç»“æž„ä½“
+	 USART_Cmd(USART1, ENABLE); //ä½¿èƒ½ä¸²å£1
 	 
 	 NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
 	 NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 5;
@@ -52,11 +52,11 @@ void Usart_Configuration(void)			//ÅäÖÃUsart1 Tx->PA9 Rx->PA10
 	 NVIC_Init(&NVIC_InitStructure);
 }
 
-//¼ÓÈëÒÔÏÂ´úÂë,Ö§³Öprintfº¯Êý,¶ø²»ÐèÒªÑ¡Ôñuse MicroLIB	  
+//åŠ å…¥ä»¥ä¸‹ä»£ç ,æ”¯æŒprintfå‡½æ•°,è€Œä¸éœ€è¦é€‰æ‹©use MicroLIB	  
 /***************************START*********************/
 #if 1
 #pragma import(__use_no_semihosting)             
-//±ê×¼¿âÐèÒªµÄÖ§³Öº¯Êý                 
+//æ ‡å‡†åº“éœ€è¦çš„æ”¯æŒå‡½æ•°                 
 struct __FILE 
 { 
 	int handle; 
@@ -64,18 +64,18 @@ struct __FILE
 	/* standard output using printf() for debugging, no file handling */ 
 	/* is required. */ 
 }; 
-/* FILE is typedef¡¯ d in stdio.h. */ 
+/* FILE is typedefâ€™ d in stdio.h. */ 
 FILE __stdout;       
-//¶¨Òå_sys_exit()ÒÔ±ÜÃâÊ¹ÓÃ°ëÖ÷»úÄ£Ê½    
+//å®šä¹‰_sys_exit()ä»¥é¿å…ä½¿ç”¨åŠä¸»æœºæ¨¡å¼    
 _sys_exit(int x) 
 { 
 	x = x; 
 } 
-//ÖØ¶¨Òåfputcº¯Êý 
+//é‡å®šä¹‰fputcå‡½æ•° 
 int fputc(int ch, FILE *f)
 {      
 	USART1->DR = (u8) ch;      
-	while((USART1->SR&0X40)==0);//Ñ­»··¢ËÍ,Ö±µ½·¢ËÍÍê±Ï   
+	while((USART1->SR&0X40)==0);//å¾ªçŽ¯å‘é€,ç›´åˆ°å‘é€å®Œæ¯•   
 	return ch;
 }
 #endif 
@@ -89,14 +89,14 @@ void Uart1_Put_Char(unsigned char DataToSend)
 }
 void Uart1_Put_String(unsigned char *Str)
 {
-	//ÅÐ¶ÏStrÖ¸ÏòµÄÊý¾ÝÊÇ·ñÓÐÐ§.
+	//åˆ¤æ–­StræŒ‡å‘çš„æ•°æ®æ˜¯å¦æœ‰æ•ˆ.
 	while(*Str)
 	{
-	//ÊÇ·ñÊÇ»Ø³µ×Ö·û Èç¹ûÊÇ,Ôò·¢ËÍÏàÓ¦µÄ»Ø³µ 0x0d 0x0a
+	//æ˜¯å¦æ˜¯å›žè½¦å­—ç¬¦ å¦‚æžœæ˜¯,åˆ™å‘é€ç›¸åº”çš„å›žè½¦ 0x0d 0x0a
 	if(*Str=='\r')Uart1_Put_Char(0x0d);
 		else if(*Str=='\n')Uart1_Put_Char(0x0a);
 			else Uart1_Put_Char(*Str);
-	//Ö¸Õë++ Ö¸ÏòÏÂÒ»¸ö×Ö½Ú.
+	//æŒ‡é’ˆ++ æŒ‡å‘ä¸‹ä¸€ä¸ªå­—èŠ‚.
 	Str++;
 	}
 }
@@ -109,7 +109,7 @@ void Uart1_Put_Buf(unsigned char *DataToSend , u8 data_num)
 		USART_ITConfig(USART1, USART_IT_TXE, ENABLE); 
 }
 
-/******************´®¿Ú1ÖÐ¶Ï·þÎñº¯Êý*******************************/
+/******************ä¸²å£1ä¸­æ–­æœåŠ¡å‡½æ•°*******************************/
 void USART1_IRQHandler()
 {
 	if (USART_GetFlagStatus(USART1, USART_FLAG_ORE) != RESET)//??!????if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)???
@@ -117,17 +117,17 @@ void USART1_IRQHandler()
         USART_ReceiveData(USART1);
     }
 		
-	//·¢ËÍÖÐ¶Ï
+	//å‘é€ä¸­æ–­
 	if((USART1->SR & (1<<7))&&(USART1->CR1 & USART_CR1_TXEIE))//if(USART_GetITStatus(USART1,USART_IT_TXE)!=RESET)
 	{
-		USART1->DR = TxBuffer[TxCounter++]; //Ð´DRÇå³ýÖÐ¶Ï±êÖ¾          
+		USART1->DR = TxBuffer[TxCounter++]; //å†™DRæ¸…é™¤ä¸­æ–­æ ‡å¿—          
 		if(TxCounter == count)
 		{
-			USART1->CR1 &= ~USART_CR1_TXEIE;		//¹Ø±ÕTXEÖÐ¶Ï
+			USART1->CR1 &= ~USART_CR1_TXEIE;		//å…³é—­TXEä¸­æ–­
 			//USART_ITConfig(USART1,USART_IT_TXE,DISABLE);
 		}
 	}
-	//½ÓÊÕÖÐ¶Ï (½ÓÊÕ¼Ä´æÆ÷·Ç¿Õ) 
+	//æŽ¥æ”¶ä¸­æ–­ (æŽ¥æ”¶å¯„å­˜å™¨éžç©º) 
 	if(USART1->SR & (1<<5))//if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)    
 	{
 		CtrData = USART1->DR;
