@@ -1,15 +1,21 @@
 #include "stm32f10x.h"
 #include "MPU6050.h"
+#include "delay.h"
 #include <stdio.h>
-//#include "delay.h"
-//#include "sys.h"
-#include "usart.h"
-//#include "math.h"
+#include "delay.h"
+#include "sys.h"
+#include "Usart.h"
+#include "math.h"
+//å…¨å±€å˜é‡å£°æ˜
+#define Gyro_Gr	0.0010653				//è§’é€Ÿåº¦å˜æˆå¼§åº¦	æ­¤å‚æ•°å¯¹åº”é™€èº2000åº¦æ¯ç§’
 
+extern unsigned char BUF[20];       //æ¥æ”¶æ•°æ®ç¼“å­˜åŒº
+extern char  test; 				 //IIC
 
+extern short GX,GY,GZ,T,AX,AY,AZ;
+//float GX_F,GY_F,GZ_F,T_F,AX_F,AY_F,AZ_F;
 //************************************
-//Simulation IIC Communication
-/*Ä£ÄâIICÊäÈëÊä³ö½Ó¿Ú*/
+/*æ¨¡æ‹ŸIICè¾“å…¥è¾“å‡ºæ¥å£*/
 #define SCL_H         GPIOB->BSRR = GPIO_Pin_10
 #define SCL_L         GPIOB->BRR  = GPIO_Pin_10 
    
@@ -21,7 +27,7 @@
 /*
 ********************************************************************************
 ** Function Name : GPIO_Configuration(void)
-** Description   : Ports Initialization, four pins of PWM, one for LED1
+** Description   : Port Initialization
 ** Input         : None
 ** Output        : None
 ** Return        : None 
@@ -30,15 +36,24 @@
 void GPIO_Configuration(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA , ENABLE);
-	// original
-	//RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD, ENABLE  );
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE  );
 
-	// four pins for PWM and one for LED1
+
+	/* Configure USART1 Tx (PA.09) as alternate function push-pull */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;				 //	åˆå§‹åŒ–ç®¡è„š9
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;		 // å¤ç”¨æ¨æŒ½è¾“å‡º
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 // é€Ÿç‡50MHz
+	GPIO_Init(GPIOA, &GPIO_InitStructure);				 // åˆå§‹åŒ–Aç«¯å£
+
+	/* Configure USART1 Rx (PA.10) as input floating */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;			  
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;	 //	æµ®ç©ºè¾“å…¥
+	GPIO_Init(GPIOA, &GPIO_InitStructure);			
+
+	//åˆå§‹åŒ–å››ä¸ªæ§åˆ¶ç”µæœºçš„Pin
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_8|GPIO_Pin_11|GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_8|GPIO_Pin_11;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);	
 
 }
@@ -54,35 +69,35 @@ void GPIO_Configuration(void)
 void I2C_GPIO_Config(void)
 {
 	GPIO_InitTypeDef  GPIO_InitStructure; 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-	
-	// PB10   SCL of IIC
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD, ENABLE  );
+
 	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_10;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;  
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
-	// PB11   SDA of IIC
+
 	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_11;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
 }
 
 
 
-//*************init MPU6050***********************
+//*************åˆå§‹åŒ–MPU6050***********************
 int Init_MPU6050(void)
 {
 	u16 i;
 	do{
-		i=Single_Read(MPU6050_Addr,WHO_AM_I);
-		Single_Write(MPU6050_Addr,PWR_MGMT_1, 0x00);	//wake up×´Ì¬
+		i = Single_Read(0xD0,WHO_AM_I);
+		Single_Write(MPU6050_Addr,PWR_MGMT_1, 0x00);	//è§£é™¤ä¼‘çœ çŠ¶æ€
 		Single_Write(MPU6050_Addr,SMPLRT_DIV, 0x07);
 		Single_Write(MPU6050_Addr,CONFIGM, 0x06);
 		Single_Write(MPU6050_Addr,GYRO_CONFIG, 0x18);
 		Single_Write(MPU6050_Addr,ACCEL_CONFIG, 0x01);
-	}while (i!=0x68);				//???
-	
+	} while(i!=0x68);
+
 	return 1;
 }
 /*
@@ -96,18 +111,17 @@ int Init_MPU6050(void)
 */
 void I2C_delay(void)
 {
-	u8 i=30; //ÕâÀï¿ÉÒÔÓÅ»¯ËÙ¶È	,¾­²âÊÔ×îµÍµ½5»¹ÄÜĞ´Èë
-	while(i) {
-		--i;
-	}
+		
+	u8 i=30; //è¿™é‡Œå¯ä»¥ä¼˜åŒ–é€Ÿåº¦	,ç»æµ‹è¯•æœ€ä½åˆ°5è¿˜èƒ½å†™å…¥
+	while(i) 
+		i--; 
 }
 
 void delay5ms(void)
 {
 	int i=5000;  
-	while(i) { 
+	while(i) 
 		i--; 
-	}  
 }
 /*******************************************************************************
 * Function Name  : I2C_Start
@@ -123,10 +137,10 @@ unsigned char I2C_Start(void)
 	SDA_H;
 	SCL_H;
 	I2C_delay();
-	if(!SDA_read)return 0;	//SDAÏßÎªµÍµçÆ½,Ôò×ÜÏßÃ¦,ÍË³ö
+	if(!SDA_read)return 0;	//SDAçº¿ä¸ºä½ç”µå¹³,åˆ™æ€»çº¿å¿™,é€€å‡º
 	SDA_L;
 	I2C_delay();
-	if(SDA_read) return 0;	//SDAÏßÎª¸ßµçÆ½,Ôò×ÜÏß³ö´í,ÍË³ö
+	if(SDA_read) return 0;	//SDAçº¿ä¸ºé«˜ç”µå¹³,åˆ™æ€»çº¿å‡ºé”™,é€€å‡º
 	SDA_L;
 	I2C_delay();
 	return 1;
@@ -200,7 +214,7 @@ void I2C_NoAck(void)
 ****************************************************************************** 
 
 */
-unsigned char I2C_WaitAck(void) 	 //·µ»Ø:=1ÓĞACK, =0ÎŞACK
+unsigned char I2C_WaitAck(void)
 {
 	SCL_L;
 	I2C_delay();
@@ -227,23 +241,23 @@ unsigned char I2C_WaitAck(void) 	 //·µ»Ø:=1ÓĞACK, =0ÎŞACK
 ****************************************************************************** 
 
 */
-void I2C_SendByte(u8 SendByte) //Êı¾İ´Ó¸ßÎ»µ½µÍÎ»//
+void I2C_SendByte(u8 SendByte) //æ•°æ®ä»é«˜ä½åˆ°ä½ä½//
 {
-    u8 i=8;
-    while(i--)
-    {
-        SCL_L;
-        I2C_delay();
-      if(SendByte&0x80)
-        SDA_H;  
-      else 
-        SDA_L;   
-        SendByte<<=1;
-        I2C_delay();
+	u8 i=8;
+	while(i--)
+	{
+		SCL_L;
+		I2C_delay();
+		if(SendByte & 0x80)
+			SDA_H;  
+		else 
+			SDA_L;   
+		SendByte <<= 1;
+		I2C_delay();
 		SCL_H;
-        I2C_delay();
-    }
-    SCL_L;
+		I2C_delay();
+	}
+	SCL_L;
 }  
 /*******************************************************************************
 * Function Name  : I2C_RadeByte
@@ -254,7 +268,7 @@ void I2C_SendByte(u8 SendByte) //Êı¾İ´Ó¸ßÎ»µ½µÍÎ»//
 ****************************************************************************** 
 
 */
-unsigned char I2C_RadeByte(void)  //Êı¾İ´Ó¸ßÎ»µ½µÍÎ»//
+unsigned char I2C_RadeByte(void)  //æ•°æ®ä»é«˜ä½åˆ°ä½ä½//
 { 
     u8 i=8;
     u8 ReceiveByte=0;
@@ -262,27 +276,29 @@ unsigned char I2C_RadeByte(void)  //Êı¾İ´Ó¸ßÎ»µ½µÍÎ»//
     SDA_H;				
     while(i--)
     {
-      ReceiveByte<<=1;      
-      SCL_L;
-      I2C_delay();
-	  SCL_H;
-      I2C_delay();	
-      if(SDA_read)
-      {
-        ReceiveByte|=0x01;
-      }
+		ReceiveByte <<= 1;      
+		SCL_L;
+		I2C_delay();
+		SCL_H;
+		I2C_delay();	
+		if(SDA_read)
+			ReceiveByte |= 0x01;
     }
     SCL_L;
     return ReceiveByte;
 } 
-//****µ¥×Ö½ÚĞ´Èë*******************************************
+//****å•å­—èŠ‚å†™å…¥*******************************************
 
 unsigned char Single_Write(unsigned char SlaveAddress,unsigned char REG_Address,unsigned char REG_data)		     //void
 {
-  	if(!I2C_Start())return 0;
-    I2C_SendByte(SlaveAddress);   //·¢ËÍÉè±¸µØÖ·+Ğ´ĞÅºÅ//I2C_SendByte(((REG_Address & 0x0700) >>7) | SlaveAddress & 0xFFFE);//ÉèÖÃ¸ßÆğÊ¼µØÖ·+Æ÷¼şµØÖ· 
-    if(!I2C_WaitAck()){I2C_Stop(); return 0;}
-    I2C_SendByte(REG_Address);   //ÉèÖÃµÍÆğÊ¼µØÖ·      
+  	if(!I2C_Start())
+		return 0;
+    I2C_SendByte(SlaveAddress);   //å‘é€è®¾å¤‡åœ°å€+å†™ä¿¡å·//I2C_SendByte(((REG_Address & 0x0700) >>7) | SlaveAddress & 0xFFFE);//è®¾ç½®é«˜èµ·å§‹åœ°å€+å™¨ä»¶åœ°å€ 
+    if(!I2C_WaitAck()) {
+		I2C_Stop();
+		return 0;
+	}
+    I2C_SendByte(REG_Address);   //è®¾ç½®ä½èµ·å§‹åœ°å€      
     I2C_WaitAck();	
     I2C_SendByte(REG_data);
     I2C_WaitAck();   
@@ -290,92 +306,74 @@ unsigned char Single_Write(unsigned char SlaveAddress,unsigned char REG_Address,
     delay5ms();
     return 1;
 }
-//****µ¥×Ó½Ú¶Á³ö*****************************************
+//****å•å­èŠ‚è¯»å‡º*****************************************
 unsigned char Single_Read(unsigned char SlaveAddress,unsigned char REG_Address)
 {   
-    unsigned char REG_data;  
-	  if(!I2C_Start())return 0;
-    I2C_SendByte(SlaveAddress); //I2C_SendByte(((REG_Address & 0x0700) >>7) | REG_Address & 0xFFFE);//ÉèÖÃ¸ßÆğÊ¼µØÖ·+Æ÷¼şµØÖ· 
-    if(!I2C_WaitAck()){I2C_Stop();test=1; return 0;}
-    I2C_SendByte((u8) REG_Address);   //ÉèÖÃµÍÆğÊ¼µØÖ·     
-    I2C_WaitAck();
-    I2C_Start();
-    I2C_SendByte(SlaveAddress+1);
-    I2C_WaitAck();
-	  REG_data= I2C_RadeByte();
-    I2C_NoAck();
-    I2C_Stop();
-    //return TRUE;
-	 return REG_data;
+	unsigned char REG_data;  
+	if(!I2C_Start())
+		return 0;
+	I2C_SendByte(SlaveAddress); //I2C_SendByte(((REG_Address & 0x0700) >>7) | REG_Address & 0xFFFE);//è®¾ç½®é«˜èµ·å§‹åœ°å€+å™¨ä»¶åœ°å€ 
+	if(!I2C_WaitAck()) {
+		I2C_Stop();
+		test=1;
+		return 0;
+	}
+	I2C_SendByte((u8) REG_Address);   //è®¾ç½®ä½èµ·å§‹åœ°å€     
+	I2C_WaitAck();
+	I2C_Start();
+	I2C_SendByte(SlaveAddress+1);
+	I2C_WaitAck();
+	REG_data= I2C_RadeByte();
+	I2C_NoAck();
+	I2C_Stop();
+	return REG_data;
 
 }						      
 void READ_MPU6050(void)
 {
-	float transform=sqrt(2)/2;
-	float axf,ayf,gxf,gyf;//,gzf,azf;
-   BUF[0]=Single_Read(0xD0,GYRO_XOUT_L); 
-   BUF[1]=Single_Read(MPU6050_Addr,GYRO_XOUT_H);
-   GX=	(BUF[1]<<8)|BUF[0];
-   gyf=GY_F=GY/16.4; 						             //¶ÁÈ¡¼ÆËãGXÊı¾İ
+	float transform = sqrt(2)/2;
+	float axf, ayf, gxf, gyf;//,gzf,azf;
+	
+	BUF[0] = Single_Read(MPU6050_Addr, GYRO_XOUT_L); 
+	BUF[1] = Single_Read(MPU6050_Addr, GYRO_XOUT_H);
+	GX =	(BUF[1]<<8) | BUF[0];
+	gxf = GX_F = GX / 16.4; 						             //è¯»å–è®¡ç®—GXæ•°æ®
 
-   BUF[2]=Single_Read(MPU6050_Addr,GYRO_YOUT_L);
-   BUF[3]=Single_Read(MPU6050_Addr,GYRO_YOUT_H);
-   GY=	(BUF[3]<<8)|BUF[2];
-   gxf=GX_F=GX/16.4; 						             //¶ÁÈ¡¼ÆËãGYÊı¾İ
+	BUF[2] = Single_Read(MPU6050_Addr, GYRO_YOUT_L);
+	BUF[3] = Single_Read(MPU6050_Addr, GYRO_YOUT_H);
+	GY =	(BUF[3]<<8) | BUF[2];
+	
+	gyf = GY_F = GY / 16.4; 								//è¯»å–è®¡ç®—GYæ•°æ®
 
-   BUF[4]=Single_Read(MPU6050_Addr,GYRO_ZOUT_L);
-   BUF[5]=Single_Read(MPU6050_Addr,GYRO_ZOUT_H);
-   GZ=	(BUF[5]<<8)|BUF[4];
-   GZ_F=GZ/16.4; 					                 //¶ÁÈ¡¼ÆËãGZÊı¾İ
+	BUF[4] = Single_Read(MPU6050_Addr, GYRO_ZOUT_L);
+	BUF[5] = Single_Read(MPU6050_Addr, GYRO_ZOUT_H);
+	GZ =	(BUF[5]<<8) | BUF[4];
+	GZ_F = GZ / 16.4; 					                 //è¯»å–è®¡ç®—GZæ•°æ®
 
-   BUF[6]=Single_Read(MPU6050_Addr,TEMP_OUT_L); 
-   BUF[7]=Single_Read(MPU6050_Addr,TEMP_OUT_H); 
-   T=(BUF[7]<<8)|BUF[6];
-   T = 35+ ((double) (T + 13200)) / 280;     //¶ÁÈ¡¼ÆËãºÏ³É ÎÂ¶È
+	BUF[6] = Single_Read(MPU6050_Addr,TEMP_OUT_L); 
+	BUF[7] = Single_Read(MPU6050_Addr,TEMP_OUT_H); 
+	T = (BUF[7]<<8)|BUF[6];
+	T = 35+ ((double) (T + 13200)) / 280;     //è¯»å–è®¡ç®—åˆæˆ æ¸©åº¦
 
-   BUF[8]=Single_Read(MPU6050_Addr,ACCEL_XOUT_L);
-   BUF[9]=Single_Read(MPU6050_Addr,ACCEL_XOUT_H);
-   AX=	(BUF[9]<<8)|BUF[8];
-   axf=AX_F=AX/16384.00; 					                 //¶ÁÈ¡¼ÆËãAXÊı¾İ
+	BUF[8]=Single_Read(MPU6050_Addr,ACCEL_XOUT_L);
+	BUF[9]=Single_Read(MPU6050_Addr,ACCEL_XOUT_H);
+	AX =	(BUF[9]<<8)|BUF[8];
+	axf = AX_F = AX / 16384.00; 					                 //è¯»å–è®¡ç®—AXæ•°æ®
 
-   BUF[10]=Single_Read(MPU6050_Addr,ACCEL_YOUT_L);
-   BUF[11]=Single_Read(MPU6050_Addr,ACCEL_YOUT_H);
-   AY=	(BUF[11]<<8)|BUF[10];
-   ayf=AY_F=AY/16384.00; 					                 //¶ÁÈ¡¼ÆËãAYÊı¾İ
+	BUF[10]=Single_Read(MPU6050_Addr,ACCEL_YOUT_L);
+	BUF[11]=Single_Read(MPU6050_Addr,ACCEL_YOUT_H);
+	AY =	(BUF[11]<<8)|BUF[10];
+	ayf = AY_F =AY/16384.00; 					                 //è¯»å–è®¡ç®—AYæ•°æ®
 
-   BUF[12]=Single_Read(MPU6050_Addr,ACCEL_ZOUT_L);
-   BUF[13]=Single_Read(MPU6050_Addr,ACCEL_ZOUT_H);
-   AZ=	(BUF[13]<<8)|BUF[12];
-   AZ_F=AZ/16384.00; 					                 //¶ÁÈ¡¼ÆËãAZÊı¾İ
-   
-	 GX_F=transform*gxf+transform*gyf;
-	 GY_F=-transform*gxf+transform*gyf;
-	 AX_F=transform*axf+transform*ayf;
-	 AY_F=-transform*axf+transform*ayf;          //½«XĞÍ×ª»»³É+ĞÍ
+	BUF[12] = Single_Read(MPU6050_Addr,ACCEL_ZOUT_L);
+	BUF[13] = Single_Read(MPU6050_Addr,ACCEL_ZOUT_H);
+	AZ =	(BUF[13]<<8)|BUF[12];
+	AZ_F = AZ / 16384.00; 					                 //è¯»å–è®¡ç®—AZæ•°æ®
+
+	GX_F = transform * gxf + transform * gyf;
+	GY_F = -transform * gxf + transform * gyf;
+	AX_F = transform * axf + transform * ayf;
+	AY_F = -transform * axf + transform * ayf;          //å°†Xå‹è½¬æ¢æˆ+å‹
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

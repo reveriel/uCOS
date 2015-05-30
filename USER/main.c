@@ -1,5 +1,5 @@
 #include "include.h"
-#include "delay.h"
+//#include "delay.h"
 #include "includes.h"
 #define LED_ON() 	GPIO_SetBits(GPIOA, GPIO_Pin_15)
 #define LED_OFF() 	GPIO_ResetBits(GPIOA, GPIO_Pin_15)
@@ -13,12 +13,14 @@
 #define		GPIO_ResetBits(GPIOA, GPIO_Pin_8);
 #define		GPIO_ResetBits(GPIOA, GPIO_Pin_11);
 */
-short GX,GY,GZ,T,AX,AY,AZ;
+short GX, GY, GZ,T,AX,AY,AZ;
 float GX_F,GY_F,GZ_F,T_F,AX_F,AY_F,AZ_F;
 unsigned char BUF[20];       			//recive data buffer
 char  test=0; 				 			//IIC
 
 
+
+/*
 
 #define START_TASK_PRIO      			10 
 #define START_STK_SIZE  				64
@@ -85,4 +87,32 @@ int main(void)
  	OSTaskCreate(start_task,(void *)0,(OS_STK *)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO);
 	OSStart();
 		
+}
+*/
+
+void delay_m(int ms)
+{
+	 ms = ms * 1000;
+	while (ms--);
+}
+
+int main(void)
+{
+	GPIO_Configuration();
+	while (1) {
+		
+		LED_ON();
+		GPIO_SetBits(GPIOA, GPIO_Pin_2);
+//		GPIO_SetBits(GPIOA, GPIO_Pin_3);
+//		GPIO_SetBits(GPIOA, GPIO_Pin_8);
+//		GPIO_SetBits(GPIOA, GPIO_Pin_11);
+		delay_m(10000);
+		LED_OFF();
+		GPIO_ResetBits(GPIOA, GPIO_Pin_2);
+//		GPIO_ResetBits(GPIOA, GPIO_Pin_3);
+//		GPIO_ResetBits(GPIOA, GPIO_Pin_8);
+//		GPIO_ResetBits(GPIOA, GPIO_Pin_11);
+		delay_m(10000);
+		
+	}
 }
