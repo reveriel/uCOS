@@ -6,14 +6,17 @@ PWM2   PA3  tim2_CH4
 PWM3   PA8  tim1_CH1
 PWM4   PA11 tim1_CH4
 
+
+
 高电平有效
 */
-
+#define PWM1(X) TIM2->CCR3 = X
+#define PWM2(X)	TIM2->CCR4 = X
+#define PWM3(X)	TIM1->CCR1 = X
+#define PWM4(X) TIM1->CCR4 = X
 	
 void PWM_OutInit(void){
 	
-	
-
 	uint16_t PrescalerValue = 0;
 
 	TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
@@ -63,6 +66,11 @@ void PWM_OutInit(void){
 	TIM_Cmd(TIM2, ENABLE);
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);//使能TIM1的主输出，因为TIM1是高级定时器  所以要这么做
 	
+	
+	PWM1(0);
+	PWM2(0);
+	PWM3(0);
+	PWM4(0);
 }
 void PWMControl(float PWM[]){
 	

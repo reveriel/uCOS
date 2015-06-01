@@ -15,12 +15,21 @@
 ////////////////////////////////////////////////////////////////////////////////// 	
    	   		   
 //IO方向设置
-#define SDA_IN()  {GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=8<<12;}     //PB11输入模式
-#define SDA_OUT()  {GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=3<<12;}   //PB11输出模式
+//#define SDA_IN()  //{GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=8<<12;}     //PB11输入模式
+//#define SDA_OUT()  //{GPIOB->CRH&=0XFFFF0FFF;GPIOB->CRH|=3<<12;}   //PB11输出模式
 //IO操作函数	 
-#define IIC_SCL    PBout(10) //SCL 
-#define IIC_SDA    PBout(11) //SDA	 
-#define READ_SDA   PBin(11)  //输入SDA 
+//#define IIC_SCL    PBout(10) //SCL 
+//#define IIC_SDA    PBout(11) //SDA	 
+//#define READ_SDA   PBin(11)  //输入SDA 
+
+#define SCL_H         GPIOB->BSRR = GPIO_Pin_10
+#define SCL_L         GPIOB->BRR  = GPIO_Pin_10 
+   
+#define SDA_H         GPIOB->BSRR = GPIO_Pin_11
+#define SDA_L         GPIOB->BRR  = GPIO_Pin_11
+
+#define SCL_read      GPIOB->IDR  & GPIO_Pin_10
+#define SDA_read      GPIOB->IDR  & GPIO_Pin_11
 
 
 // SCL PB10
@@ -28,8 +37,9 @@
 
 
 //IIC所有操作函数
-void IIC_Init(void);                //初始化IIC的IO口				 
-void IIC_Start(void);				//发送IIC开始信号
+void IIC_Init(void);                //初始化IIC的IO口		
+
+u8 IIC_Start(void);				//发送IIC开始信号
 void IIC_Stop(void);	  			//发送IIC停止信号
 void IIC_Send_Byte(u8 txd);			//IIC发送一个字节
 u8 IIC_Read_Byte(unsigned char ack);//IIC读取一个字节

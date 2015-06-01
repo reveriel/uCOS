@@ -18,6 +18,24 @@
 //初始化MPU6050
 //返回值:0,成功
 //    其他,错误代码
+
+u8 Init_MPU6050(void)
+{
+	u16 i =19;
+	IIC_Init();
+	do{
+
+	MPU_Write_Byte(MPU_PWR_MGMT1_REG, 0x00);	//解除休眠状态
+	MPU_Write_Byte(MPU_SAMPLE_RATE_REG, 0x07);
+	MPU_Write_Byte(MPU_CFG_REG, 0x06);
+	MPU_Write_Byte(MPU_GYRO_CFG_REG, 0x18);
+	MPU_Write_Byte(MPU_ACCEL_CFG_REG, 0x01);
+	}
+	while(i--);
+	
+	return 1;
+}
+
 u8 MPU_Init(void)
 { 
 	u8 res;
@@ -112,7 +130,7 @@ u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
 		*gy=((u16)buf[2]<<8)|buf[3];  
 		*gz=((u16)buf[4]<<8)|buf[5];
 	} 	
-    return res;;
+    return res;
 }
 //得到加速度值(原始值)
 //gx,gy,gz:陀螺仪x,y,z轴的原始读数(带符号)
@@ -128,7 +146,7 @@ u8 MPU_Get_Accelerometer(short *ax,short *ay,short *az)
 		*ay=((u16)buf[2]<<8)|buf[3];  
 		*az=((u16)buf[4]<<8)|buf[5];
 	} 	
-    return res;;
+    return res;
 }
 //IIC连续写
 //addr:器件地址 

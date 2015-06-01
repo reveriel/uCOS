@@ -1,6 +1,11 @@
 #include "include.h"
+#include <math.h>
 //#include "includes.h"
 
+#define PWM1(X) TIM2->CCR3 = X
+#define PWM2(X)	TIM2->CCR4 = X
+#define PWM3(X)	TIM1->CCR1 = X
+#define PWM4(X) TIM1->CCR4 = X
 
 #define LED_ON() 	GPIO_SetBits(GPIOA, GPIO_Pin_15)
 #define LED_OFF() 	GPIO_ResetBits(GPIOA, GPIO_Pin_15)
@@ -174,28 +179,105 @@ void usart1_report_imu(short aacx,short aacy,short aacz,short gyrox,short gyroy,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+short ax, ay, az;
+
+
+
+
+
+
+
+u8 Init_MPU6050(void);
+
 int main(void)
 {
 	u8 report = 1;
-	float pitch,roll,yaw; 		//欧拉角
-	short aacx,aacy,aacz;		//加速度传感器原始数据
-	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
-////short temp;					//温度
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
-	delay_init(); 		 //初始化延时函数
-	Usart_Configuration();
-	MPU_Init(); 
-	if(mpu_dmp_init() == 0)
-		printf("dmp_init_OK");
+	int i = 0;
+	int state = 0;
+//	float pitch,roll,yaw; 		//欧拉角
+//	short aacx,aacy,aacz;		//加速度传感器原始数据
+//	short gyrox,gyroy,gyroz;	//陀螺仪原始数据
+//////short temp;					//温度
+//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
+//	delay_init(); 		 //初始化延时函数
+//	PWM_OutInit();
+//	Usart_Configuration();
+////	MPU_Init(); 
+//	Init_MPU6050();
+//	if(mpu_dmp_init() == 0)
+//		printf("dmp_init_OK");
+////	while(1)
+////	{
+////		/*if(mpu_dmp_get_data(&pitch,&roll,&yaw)==0)
+////		{ 
+////			//temp=MPU_Get_Temperature();	//得到温度值
+////			MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
+////			MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
+////			if(report)mpu6050_send_data(aacx,aacy,aacz,gyrox,gyroy,gyroz);//用自定义帧发送加速度和陀螺仪原始数据
+////			if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
+////		}*/
+//////		MPU_Get_Accelerometer(&ax, &ay, &az);
+//////		printf("%d \n", az);
+////		PWM1(3);
+//////		PWM2(3);
+//////		PWM3(3);
+//////		PWM4(3);
+////		LED_ON();
+////		delay_ms(30);
+////		
+////	}
+	PWM_OutInit();
+	delay_init();
 	while(1)
 	{
-		if(mpu_dmp_get_data(&pitch,&roll,&yaw)==0)
-		{ 
-			//temp=MPU_Get_Temperature();	//得到温度值
-			MPU_Get_Accelerometer(&aacx,&aacy,&aacz);	//得到加速度传感器数据
-			MPU_Get_Gyroscope(&gyrox,&gyroy,&gyroz);	//得到陀螺仪数据
-			if(report)mpu6050_send_data(aacx,aacy,aacz,gyrox,gyroy,gyroz);//用自定义帧发送加速度和陀螺仪原始数据
-			if(report)usart1_report_imu(aacx,aacy,aacz,gyrox,gyroy,gyroz,(int)(roll*100),(int)(pitch*100),(int)(yaw*10));
-		} 	
+		if (state == 0) {
+			i += 10;
+			PWM1(i);
+			if (i > 900)
+				state = 1;
+		}
+		else {
+			i -= 10;
+			PWM1(i);
+			if (i < 10)
+				state = 0;
+		}
+		delay_ms(100);
+		PWM4(0);
 	}
+	
+//	while (1)
+//	{
+//		GPIO_SetBits(GPIOA, GPIO_Pin_11);
+//		delay_us(100000);
+//		GPIO_ResetBits(GPIOA, GPIO_Pin_11);
+//		delay_us(100000);
+//	}
 }

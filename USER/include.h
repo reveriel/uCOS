@@ -6,9 +6,15 @@
 #include "sys.h"
 #include "usart.h"
 #include "mpu6050.h"
+#include "inv_mpu.h"
+#include "inv_mpu_dmp_motion_driver.h"
+#include "pwm.h"
+
+
+
 //#include "inter.h"
 //#include "math.h"
-//#include "pwm.h"
+
 //#include "scope.h"
 //#include "exchange.h"
 //#include "send.h"
