@@ -6,17 +6,9 @@
 #include "includes.h"					//ucos 使用	  
 #endif
 //////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32开发板
-//使用SysTick的普通计数模式对延迟进行管理
+
 //包括delay_us,delay_ms
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2012/9/2
-//版本：V1.5
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved
+
 //********************************************************************************
 //V1.2修改说明
 //修正了中断中调用出现死循环的错误
@@ -39,7 +31,7 @@ static u8  fac_us=0;//us延时倍乘数
 static u16 fac_ms=0;//ms延时倍乘数
 #ifdef OS_CRITICAL_METHOD 	//如果OS_CRITICAL_METHOD定义了,说明使用ucosII了.
 //systick中断服务函数,使用ucos时用到
-void SysTick_Handler(void)
+void SysTick_Handler(void) 
 {				   
 	OSIntEnter();		//进入中断
     OSTimeTick();       //调用ucos的时钟服务程序               

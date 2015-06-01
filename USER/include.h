@@ -2,10 +2,10 @@
 #define __INCLUDE_H_
 #include "stm32f10x.h"
 #include <stdio.h>
-//#include "delay.h"
-//#include "sys.h"
+#include "delay.h"
+#include "sys.h"
 #include "usart.h"
-#include "MPU6050.h"
+#include "mpu6050.h"
 //#include "inter.h"
 //#include "math.h"
 //#include "pwm.h"
