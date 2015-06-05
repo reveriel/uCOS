@@ -255,6 +255,15 @@ int main(void)
 ////	}
 	PWM_OutInit();
 	delay_init();
+	
+//	while (1)
+//	{
+//		GPIO_SetBits(GPIOA, GPIO_Pin_11);
+//		delay_ms(1000);
+//		GPIO_ResetBits(GPIOA, GPIO_Pin_11);
+//		delay_ms(1000);
+//	
+//	}
 	while(1)
 	{
 		if (state == 0) {
@@ -280,4 +289,12 @@ int main(void)
 //		GPIO_ResetBits(GPIOA, GPIO_Pin_11);
 //		delay_us(100000);
 //	}
+//	
+	
+	
+	
+	
+	
 }
+
+
