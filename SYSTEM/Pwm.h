@@ -2,7 +2,7 @@
 #define __MOTOR_H
 #include "include.h"
 
-void PWM_OutInit(void);
+void PWM_Configuration(void);
 void PWMControl(float*);
 
 #endif

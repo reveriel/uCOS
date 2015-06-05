@@ -1,14 +1,16 @@
 #ifndef __INCLUDE_H_
 #define __INCLUDE_H_
 #include "stm32f10x.h"
-#include <stdio.h>
+
 #include "delay.h"
 #include "sys.h"
 #include "usart.h"
 #include "mpu6050.h"
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
 #include "pwm.h"
+
+//#include "inv_mpu.h"
+//#include "inv_mpu_dmp_motion_driver.h"
+
 
 
 
@@ -24,6 +26,10 @@
 //#include "Nrf24l01.h"
 //#include "SysTick.h"
 
+
+#include <stdio.h>
+#include <math.h>
+
 #define MOTOL1 GPIO_Pin_2
 #define MOTOL2 GPIO_Pin_3
 #define MOTOL3 GPIO_Pin_8
@@ -35,7 +41,6 @@ extern u32 Second;
 extern u8 LoopFlag;
 extern float PWM[4];
 
-void GPIO_Configuration(void);
 
 
 #endif

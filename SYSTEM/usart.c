@@ -26,7 +26,7 @@ void Usart_Configuration(void)			//配置Usart1 Tx->PA9 Rx->PA10
 	 GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//上拉输入
 	 GPIO_Init(GPIOA, &GPIO_InitStructure);
 	 
-	 USART_InitStructure.USART_BaudRate =9600; //9600; //波特率115200
+	 USART_InitStructure.USART_BaudRate =  9600; //9600;    //波特率
 	 USART_InitStructure.USART_WordLength = USART_WordLength_8b; //8位数据
 	 USART_InitStructure.USART_StopBits = USART_StopBits_1; //1个停止位
 	 USART_InitStructure.USART_Parity = USART_Parity_No; //奇偶使能
