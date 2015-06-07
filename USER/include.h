@@ -7,6 +7,9 @@
 #include "usart.h"
 #include "mpu6050.h"
 #include "pwm.h"
+#include "SysTick.h"
+
+
 
 //#include "inv_mpu.h"
 //#include "inv_mpu_dmp_motion_driver.h"
@@ -24,7 +27,7 @@
 //#include "FlyControl.h"
 //#include "Spi.h"
 //#include "Nrf24l01.h"
-//#include "SysTick.h"
+
 
 
 #include <stdio.h>

@@ -1,6 +1,7 @@
 #include "stm32f10x.h"
 #include "mpu6050.h"
 #include "math.h"
+#include "SysTick.h"
 
 
 
@@ -70,6 +71,79 @@ void READ_MPU6050(void)
 	AY_F = - transform * axf + transform * ayf;          //将X型转换成+型
 }
 
+
+float q0=1, q1=0, q2=0, q3=0;
+float exInt=0, eyInt=0, ezInt=0;
+extern float Roll, Yaw, Pitch;
+
+
+
+void IMUupdate(float gx, float gy, float gz, float ax, float ay, float az)
+{
+	float deltaT;
+	float norm;
+	float vx, vy, vz;
+	float ex, ey, ez;
+	float q0q0 = q0*q0;
+	float q0q1 = q0*q1;
+	float q0q2 = q0*q2;
+	float q1q1 = q1*q1;
+	float q1q3 = q1*q3;
+	float q2q2 = q2*q2;   
+	float q2q3 = q2*q3;
+	float q3q3 = q3*q3;
+
+	if(ax*ay*az==0)
+	{
+	  return;
+	}
+	
+	deltaT = getDeltaT(GetSysTime_us());
+
+	norm=sqrt(ax*ax+ay*ay+az*az);
+	ax=ax/norm;
+	ay=ay/norm;
+	az=az/norm;
+	vx = 2*(q1q3 - q0q2);
+	vy = 2*(q0q1 + q2q3);
+	vz = q0q0 - q1q1 - q2q2 + q3q3;
+	
+
+	ex = (ay*vz - az*vy);//用加速度计修正四元数
+	ey = (az*vx - ax*vz);
+	ez = (ax*vy - ay*vx);
+
+	exInt = exInt + ex * Ki * KT*deltaT;
+	eyInt = eyInt + ey * Ki * KT*deltaT;  
+	ezInt = ezInt + ez * Ki * KT*deltaT;		
+
+	gx = gx + (Kp*ex + exInt);//加速度计来修正陀螺仪
+	gy = gy + (Kp*ey + eyInt);
+	gz = gz + (Kp*ez + ezInt);
+
+	q0 = q0 + (-q1*gx - q2*gy - q3*gz)*KT*deltaT;//互补滤波后的值更新四元数（by微分方程）
+	q1 = q1 + (q0*gx + q2*gz - q3*gy)*KT*deltaT;
+	q2 = q2 + (q0*gy - q1*gz + q3*gx)*KT*deltaT;
+	q3 = q3 + (q0*gz + q1*gy - q2*gx)*KT*deltaT;  	
+	norm=sqrt(q0*q0+q1*q1+q2*q2+q3*q3);
+	q0 = q0 / norm;
+	q1 = q1 / norm;
+	q2 = q2 / norm;
+	q3 = q3 / norm;
+
+	Roll = 1.41*(atan2(2.0f*(q0*q1 + q2*q3),1 - 2.0f*(q1*q1 + q2*q2)))* 180/3.14;
+	Pitch = 1.41*asin(2.0f*(q0*q2 - q3*q1))* 180/3.14;
+	Yaw = 1.41*atan2(2 * q1 * q2 + 2 * q0 * q3, -2 * q2*q2 - 2 * q3 * q3 + 1)* 180/3.14;
+
+	if(Roll>90||Roll<-90)
+	{
+		if(Pitch>0)
+			Pitch=180-Pitch;
+		if(Pitch<0)
+			Pitch=-(180+Pitch);
+	}
+
+}
 /*
 ******************************************************************************
 * Function Name  : I2C_GPIO_Configuration

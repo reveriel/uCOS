@@ -35,6 +35,13 @@ int MPU6050_Configuration(void);
 void READ_MPU6050(void);
 
 
+/* ******* 计算欧拉角  *********************/
+
+#define Kp 50.0f
+#define Ki 40.0f
+#define KT 0.0088f
+void IMUupdate(float gx, float gy, float gz, float ax, float ay, float az);
+
 
 
 /*********** IIC bus comunication *************/

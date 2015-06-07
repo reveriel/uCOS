@@ -37,7 +37,13 @@ void SysTick_Handler(void)
     OSTimeTick();       //调用ucos的时钟服务程序               
     OSIntExit();        //触发任务切换软中断
 }
+
+#else
+
+
 #endif
+
+
 
 //初始化延迟函数
 //当使用ucos的时候,此函数会初始化ucos的时钟节拍

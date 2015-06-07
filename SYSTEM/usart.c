@@ -4,8 +4,11 @@
 u8 TxBuffer[256];
 u8 TxCounter=0;
 u8 count=0;
-u8 CtrData=0;
+//u8 CtrData=0;
 u8 RxBuffer[50];
+
+
+
 static u8 RxState = 0;
 void Usart_Configuration(void)			//配置Usart1 Tx->PA9 Rx->PA10
 {
