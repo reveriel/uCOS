@@ -2,11 +2,6 @@
 #include "FlyControl.h"
 
 
-float CPitch=0;
-float CRoll=0;
-float CYaw=0;
-
-
 /**** int main.c ****/
 extern u8 CtrData;
 extern float Pitch, Roll, Yaw;
@@ -30,6 +25,11 @@ float deltaT;
 */
 void Control()
 {
+
+	float CPitch=0;
+	float CRoll=0;
+	float CYaw=0;
+
 	switch(CtrData)
 	{
 	case 0:
