@@ -1,4 +1,5 @@
 #include "include.h"
+#include "FlyControl.h"
 
 
 float CPitch=0;
@@ -6,38 +7,24 @@ float CRoll=0;
 float CYaw=0;
 
 
+/**** int main.c ****/
+extern u8 CtrData;
+extern float Pitch, Roll, Yaw;
+extern float PWM[4];
 
 
 
-#define Kk 10
-#define PB__roll 1.6*Kk
-#define DB__roll 43*Kk
-#define IB__roll 0.004*Kk
-#define PB__pitch 1.6*Kk
-#define DB__pitch 43*Kk
-#define IB__pitch 0.004*Kk
-#define PB__yaw 1.6*Kk
-#define DB__yaw 43*Kk
-#define IB__yaw 0.004*Kk
-
-#define PB__roll_in 0.2
-#define DB__roll_in 1
-#define IB__roll_in 0
-#define PB__pitch_in 0.2
-#define DB__pitch_in 1
-#define IB__pitch_in 0
-#define PB__yaw_in 2
-#define DB__yaw_in 10
-#define IB__yaw_in 0
 
 
-#define CtrSize 0.02
 float COS=0;
 float FeedBack(float,int);
 float InfMax(float);
 float FeedBackRollOut = 0, FeedBackRollIn = 0, FeedBackPitchOut = 0,FeedBackPitchIn = 0, FeedBackYawIn = 0, FeedBackYawOut=0;
 float M=830;
-	float deltaT;
+
+
+float deltaT;
+
 void Control()
 {
 	switch(CtrData)
@@ -123,17 +110,18 @@ void Control()
 //	PWM[1]=InfMax((M-FeedBackYawOut+FeedBackRollOut+FeedBackPitchOut)/COS);
 //	PWM[2]=InfMax((M-FeedBackYawOut-FeedBackRollOut-FeedBackPitchOut)/COS);
 //	PWM[3]=InfMax((M+FeedBackYawOut-FeedBackRollOut+FeedBackPitchOut)/COS);
-	if(schedulercnt_20ms > 60)
-	{
-		//cuo0=0;cuo1=0;
-		//printf("123564");
-		//show4(PWM[0],PWM[1],PWM[2],PWM[3]);
-		//send1(1.1);
-		//show1(data - lastdata[i]);	
-		show4(Roll,CRoll,Pitch,CPitch	);	
-		schedulercnt_20ms = 0;
-	}
-	
+
+//	if(schedulercnt_20ms > 60)
+//	{
+//		//cuo0=0;cuo1=0;
+//		//printf("123564");
+//		//show4(PWM[0],PWM[1],PWM[2],PWM[3]);
+//		//send1(1.1);
+//		//show1(data - lastdata[i]);	
+//		show4(Roll,CRoll,Pitch,CPitch	);	
+//		schedulercnt_20ms = 0;
+//	}
+//	
 	
 }
 float InfMax(float x)

@@ -12,25 +12,41 @@
 
 float GX_F, GY_F, GZ_F, T_F, AX_F, AY_F, AZ_F;			// global var ,for mpu6050_read()
 float Roll, Yaw, Pitch;
+float PWM[4];
 
+u8 CtrData;
 
 int main(void)
 {
-	u16 time = 0;
+
+	int  cnt = 500000;
 	Usart_Configuration();
 	MPU6050_Configuration();
 	PWM_Configuration();
 	
+	
 	SysTick_Config(SystemCoreClock / 1000); // ms
 	
+	CtrData = 1;
+	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 1000;   // 910
 	while (1) {
 		
-
-			READ_MPU6050();
-			IMUupdate(GX_F,GY_F,GZ_F,AX_F,AY_F,AZ_F);
-//			printf("%f   \n", AZ_F);
-			printf("%30f    %30f    %30f    ", Roll, Yaw, Pitch);
+		if(schedulercnt_2ms >= 2)
+		{	 
+			cnt--;
+			if (cnt <= 0) {
+				PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0;
+				PWMControl(PWM);
+			}
 			
+			PWMControl(PWM);
+//			READ_MPU6050();
+//			Control();
+//			PWMControl(PWM);
+//			
+//			schedulercnt_2ms = 0;
+
+		}
 		
 	}
 	

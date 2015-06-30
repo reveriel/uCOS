@@ -17,7 +17,6 @@ void PWM_Configuration(void){
 	TIM_OCInitTypeDef  			TIM_OCInitStructure;
 	GPIO_InitTypeDef 			GPIO_InitStructure;
 	
-	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1|RCC_APB2Periph_GPIOA, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);//开启TIM1、2,GPIO,// no AFIO外设时钟
 
@@ -25,8 +24,6 @@ void PWM_Configuration(void){
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
-
 
 
 	/* Compute the prescaler value */
