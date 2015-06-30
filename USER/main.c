@@ -1,13 +1,11 @@
 #include "include.h"
-//#include "includes.h"
+#include "includes.h"
 
 #define PWM1(X) TIM2->CCR3 = X
 #define PWM2(X)	TIM2->CCR4 = X
 #define PWM3(X)	TIM1->CCR1 = X
 #define PWM4(X) TIM1->CCR4 = X
 
-#define LED_ON() 	GPIO_SetBits(GPIOA, GPIO_Pin_15)
-#define LED_OFF() 	GPIO_ResetBits(GPIOA, GPIO_Pin_15)
 
 
 float GX_F, GY_F, GZ_F, T_F, AX_F, AY_F, AZ_F;			// global var ,for mpu6050_read()
@@ -41,8 +39,8 @@ int main(void)
 				PWMControl(PWM);
 			}
 			
-//			READ_MPU6050();
-//			Control();
+			READ_MPU6050();
+			Control();
 			PWMControl(PWM);
 			
 			schedulercnt_2ms = 0;

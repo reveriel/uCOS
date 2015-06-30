@@ -11,7 +11,7 @@ int MPU6050_Configuration(void)
 	u16 i;
 	I2C_GPIO_Configuration();
 	do{
-		i=Single_Read(0xD0,WHO_AM_I);
+		i = Single_Read(0xD0,WHO_AM_I);
 		Single_Write(MPU6050_Addr,PWR_MGMT_1, 0x00);	//解除休眠状态
 		Single_Write(MPU6050_Addr,SMPLRT_DIV, 0x07);	// 
 		Single_Write(MPU6050_Addr,CONFIGM, 0x06);		//
@@ -23,23 +23,25 @@ int MPU6050_Configuration(void)
 	return 1;
 }
 
-short GX, GY, GZ, T, AX, AY, AZ;
-unsigned char BUF[20];       //buffer for mpu_read module
 
+/* update global var : GX_F, GY_F, GZ_F, AX_F, AY_F, AZ_F */
 
 void READ_MPU6050(void)
 {
 	float transform = sqrt(2)/2;
 	float axf, ayf, gxf, gyf;//,gzf,azf;
+	short GX, GY, GZ, T, AX, AY, AZ;
+	unsigned char BUF[20];       //buffer 
+
 	BUF[0]=Single_Read(0xD0,GYRO_XOUT_L); 
 	BUF[1]=Single_Read(MPU6050_Addr,GYRO_XOUT_H);
 	GX = (BUF[1]<<8)|BUF[0];
-	gyf = GY_F = GY / 16.4; 						             //读取计算GX数据
+	gxf = GX_F = GX / 16.4; 						            
 
 	BUF[2]=Single_Read(MPU6050_Addr,GYRO_YOUT_L);
 	BUF[3]=Single_Read(MPU6050_Addr,GYRO_YOUT_H);
 	GY = (BUF[3]<<8)|BUF[2];
-	gxf = GX_F = GX / 16.4; 						             //读取计算GY数据
+	gyf = GY_F = GY / 16.4; 						             
 
 	BUF[4]=Single_Read(MPU6050_Addr,GYRO_ZOUT_L);
 	BUF[5]=Single_Read(MPU6050_Addr,GYRO_ZOUT_H);
@@ -48,8 +50,8 @@ void READ_MPU6050(void)
 
 	BUF[6]=Single_Read(MPU6050_Addr,TEMP_OUT_L); 
 	BUF[7]=Single_Read(MPU6050_Addr,TEMP_OUT_H); 
-	T = (BUF[7]<<8)|BUF[6];
-	T = 35+ ((double) (T + 13200)) / 280;     //读取计算合成 温度
+	//T = (BUF[7]<<8)|BUF[6];
+	//T = 35+ ((double) (T + 13200)) / 280;     //读取计算合成 温度
 
 	BUF[8]=Single_Read(MPU6050_Addr,ACCEL_XOUT_L);
 	BUF[9]=Single_Read(MPU6050_Addr,ACCEL_XOUT_H);
@@ -73,8 +75,7 @@ void READ_MPU6050(void)
 }
 
 
-float q0=1, q1=0, q2=0, q3=0;
-float exInt=0, eyInt=0, ezInt=0;
+// global var
 extern float Roll, Yaw, Pitch;
 
 
@@ -83,6 +84,9 @@ extern float Roll, Yaw, Pitch;
 */ 
 void IMUupdate(float gx, float gy, float gz, float ax, float ay, float az)
 {
+	float q0=1, q1=0, q2=0, q3=0;
+	float exInt=0, eyInt=0, ezInt=0;
+
 	float deltaT;
 	float norm;
 	float vx, vy, vz;
