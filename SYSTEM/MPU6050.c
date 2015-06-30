@@ -26,6 +26,7 @@ int MPU6050_Configuration(void)
 short GX, GY, GZ, T, AX, AY, AZ;
 unsigned char BUF[20];       //buffer for mpu_read module
 
+
 void READ_MPU6050(void)
 {
 	float transform = sqrt(2)/2;
@@ -77,7 +78,9 @@ float exInt=0, eyInt=0, ezInt=0;
 extern float Roll, Yaw, Pitch;
 
 
-
+/* input : gyro x/y/z,  accele  x/y/z 
+* do :   compute   Roll, Pitch, Yaw(global, define in main)
+*/ 
 void IMUupdate(float gx, float gy, float gz, float ax, float ay, float az)
 {
 	float deltaT;

@@ -27,28 +27,30 @@ int main(void)
 	
 	SysTick_Config(SystemCoreClock / 1000); // ms
 	
-	CtrData = 1;
-	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 1000;   // 910
+	CtrData = 1;  
+	
+	
+	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
 	while (1) {
 		
 		if(schedulercnt_2ms >= 2)
 		{	 
 			cnt--;
 			if (cnt <= 0) {
-				PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0;
+				PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
 				PWMControl(PWM);
 			}
 			
-			PWMControl(PWM);
 //			READ_MPU6050();
 //			Control();
-//			PWMControl(PWM);
-//			
-//			schedulercnt_2ms = 0;
+			PWMControl(PWM);
+			
+			schedulercnt_2ms = 0;
 
 		}
 		
 	}
 	
 }
-     
+
+

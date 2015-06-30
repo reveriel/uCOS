@@ -15,7 +15,6 @@ extern float PWM[4];
 
 
 
-
 float COS=0;
 float FeedBack(float,int);
 float InfMax(float);
@@ -25,6 +24,10 @@ float M=830;
 
 float deltaT;
 
+/* data it usese,
+*  CtrData 
+*  data from MPU, 
+*/
 void Control()
 {
 	switch(CtrData)
