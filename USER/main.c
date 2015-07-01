@@ -26,10 +26,43 @@ u8 CtrData;
 */
 
 
+/* test code */
+
+#define TASK_STK_SIZE 512
+OS_STK MyTaskStk[TASK_STK_SIZE];
+void MyTask(void *pdata);
+
+void main(void)
+{
+	OSInit();
+	OSTaskCreate(
+		MyTask,
+		(void *)0,
+		&MyTaskStk[TASK_STK_SIZE - 1],
+		0);
+	OSStart();
+}
+
+void MyTask(void *pdata)
+{
+	OS_CPU_SR cpu_sr = 0;
+	pdata = pdata;
+	Usart_Configuration();
+	
+	for (;;) {
+		printf("hahahaa\t");
+	}
+}
+
+
+
+
+/*
+
 int main(void)
 {
 
-	int  cnt = 500000;
+	int  cnt = 5000;
 	Usart_Configuration();
 	MPU6050_Configuration();
 	PWM_Configuration();
@@ -41,13 +74,14 @@ int main(void)
 	
 	
 	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
+	
 	while (1) {
 		
 		if(schedulercnt_2ms >= 2)
 		{	 
 			cnt--;
 			if (cnt <= 0) {
-				PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
+				PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0 ;
 				PWMControl(PWM);
 			}
 			
@@ -62,5 +96,5 @@ int main(void)
 	}
 	
 }
-
+*/
 
