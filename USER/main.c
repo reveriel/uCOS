@@ -12,7 +12,19 @@ float GX_F, GY_F, GZ_F, T_F, AX_F, AY_F, AZ_F;			// global var ,for mpu6050_read
 float Roll, Yaw, Pitch;
 float PWM[4];
 
-u8 CtrData;
+u8 CtrData;		
+
+/*************************
+* OS task 
+* 1. a task to initiate all hardware
+* 	  then stop it,  start * and *
+* 2. a task to call read_MPU6050()
+* 3, a task to call IMU
+* 4, a task to print data 
+*
+**************************
+*/
+
 
 int main(void)
 {
