@@ -48,7 +48,8 @@ void startTask(void *pdata);
 
 int main(void)
 {
-	delay_init();
+	//delay_init();
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
 	NVIC_Configuration();
 	Usart_Configuration();
 	
@@ -85,7 +86,8 @@ void task1(void *pdata)
 {
 	for (;;) {
 		printf("dhahah   ");
-		delay_ms(220);
+//		delay_ms(220);
+		OSTimeDlyHMSM(0, 0, 1, 0);
 	}
 }
 
@@ -93,7 +95,8 @@ void task2(void *pdata)
 {
 	for (;;) {
 		printf("eeeee   ");
-		delay_ms(223);
+//		delay_ms(223);
+		OSTimeDlyHMSM(0, 0, 1, 0);
 	}
 }
 
