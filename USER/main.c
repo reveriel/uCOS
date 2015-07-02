@@ -30,11 +30,15 @@ u8 CtrData;
 
 #define TASK_STK_SIZE 512
 OS_STK MyTaskStk[TASK_STK_SIZE];
+OS_STK YourTaskStk[TASK_STK_SIZE];
+void YourTask(void *pdata);
 void MyTask(void *pdata);
 
 void main(void)
 {
 	OSInit();
+	delay_init();
+	NVIC_Configuration();
 	OSTaskCreate(
 		MyTask,
 		(void *)0,
@@ -48,9 +52,29 @@ void MyTask(void *pdata)
 	OS_CPU_SR cpu_sr = 0;
 	pdata = pdata;
 	Usart_Configuration();
+	OSTaskCreate(
+		YourTask, 
+		(void *)0, 
+		&YourTaskStk[TASK_STK_SIZE - 1],
+		2);
 	
 	for (;;) {
+		OS_ENTER_CRITICAL();
 		printf("hahahaa\t");
+		OS_EXIT_CRITICAL();
+		OSTimeDlyHMSM(0, 0, 3, 0);
+	}
+}
+
+void YourTask(void *pdata)
+{
+	OS_CPU_SR cpu_sr = 0;
+	pdata = pdata;
+	for (;;) {
+		OS_ENTER_CRITICAL();
+		printf("xixi\t");
+		OS_EXIT_CRITICAL();
+		OSTimeDlyHMSM(0, 0, 1, 0);
 	}
 }
 
