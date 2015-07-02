@@ -28,57 +28,74 @@ u8 CtrData;
 
 /* test code */
 
-#define TASK_STK_SIZE 512
-OS_STK MyTaskStk[TASK_STK_SIZE];
-OS_STK YourTaskStk[TASK_STK_SIZE];
-void YourTask(void *pdata);
-void MyTask(void *pdata);
 
-void main(void)
+#define TASK1_PRIO 2
+#define TASK1_STACK_SIZE 128
+OS_STK task1Stack[TASK1_STACK_SIZE];
+void task1(void *pdata);
+
+#define TASK2_PRIO 3
+#define TASK2_STACK_SIZE 128
+OS_STK task2Stack[TASK2_STACK_SIZE];
+void task2(void *pdata);
+
+#define START_TASK_PRIO 10
+#define START_TASK_STACK_SIZE 128
+OS_STK startTaskStack[START_TASK_STACK_SIZE];
+void startTask(void *pdata);
+
+
+
+int main(void)
 {
-	OSInit();
 	delay_init();
 	NVIC_Configuration();
+	Usart_Configuration();
+	
+	OSInit();
 	OSTaskCreate(
-		MyTask,
+		startTask,
 		(void *)0,
-		&MyTaskStk[TASK_STK_SIZE - 1],
-		0);
+		&startTaskStack[START_TASK_STACK_SIZE - 1],
+		START_TASK_PRIO);
+		
 	OSStart();
 }
 
-void MyTask(void *pdata)
+void startTask(void *pdata)
 {
 	OS_CPU_SR cpu_sr = 0;
 	pdata = pdata;
-	Usart_Configuration();
+	OS_ENTER_CRITICAL();
 	OSTaskCreate(
-		YourTask, 
-		(void *)0, 
-		&YourTaskStk[TASK_STK_SIZE - 1],
-		2);
+		task1,
+		(void *)0,
+		&task1Stack[TASK1_STACK_SIZE - 1],
+		TASK1_PRIO);
+	OSTaskCreate(
+		task2,
+		(void *)0,
+		&task2Stack[TASK2_STACK_SIZE - 1],
+		TASK2_PRIO);
+	OSTaskSuspend(START_TASK_PRIO);
+	OS_EXIT_CRITICAL();
+}
 	
-	for (;;) {
-		OS_ENTER_CRITICAL();
-		printf("hahahaa\t");
-		OS_EXIT_CRITICAL();
-		OSTimeDlyHMSM(0, 0, 3, 0);
-	}
-}
-
-void YourTask(void *pdata)
+void task1(void *pdata)
 {
-	OS_CPU_SR cpu_sr = 0;
-	pdata = pdata;
 	for (;;) {
-		OS_ENTER_CRITICAL();
-		printf("xixi\t");
-		OS_EXIT_CRITICAL();
-		OSTimeDlyHMSM(0, 0, 1, 0);
+		printf("dhahah   ");
+		delay_ms(220);
 	}
 }
 
-
+void task2(void *pdata)
+{
+	for (;;) {
+		printf("eeeee   ");
+		delay_ms(223);
+	}
+}
 
 
 /*
