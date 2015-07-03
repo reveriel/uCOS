@@ -133,7 +133,10 @@ int main(void)
 
 	led_Configuration();
 	MPU6050_Configuration();
-	PWM_Configuration();
+//	PWM_Configuration();
+	TIM3_PWM_Init();
+	TIM1_PWM_Init();
+	TIM2_PWM_Init();
 	
 //	SysTick_Config(SystemCoreClock / 1000); // ms
 	

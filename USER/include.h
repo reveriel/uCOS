@@ -6,10 +6,11 @@
 #include "sys.h"
 #include "usart.h"
 #include "mpu6050.h"
-#include "pwm.h"
+#include "Pwm.h"
 #include "SysTick.h"
 #include "FlyControl.h"
 #include "led.h"
+#include "pwm_init.h"
 
 
 //#include "inv_mpu.h"
