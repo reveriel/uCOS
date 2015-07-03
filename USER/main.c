@@ -125,11 +125,12 @@ void task2(void *pdata)
 
 int main(void)
 {
-
+	int first = 1;
 	int i = 100000000;
 	int j = 10000000;
 	int  cnt = 1000;
 	delay_init();
+
 
 	led_Configuration();
 	MPU6050_Configuration();
@@ -154,18 +155,19 @@ int main(void)
 				//读加速度计和陀螺仪数据
 				READ_MPU6050();
 					//飞控函数
-				Control();
+				Control(first);
 				//PWM波输出函数
-				PWMControl(PWM);
+				
 				cnt--;
 			}
 			else {
 				CtrData = CTRL_STOP;
-				Control();
+				Control(first);
 				PWMControl(PWM);
 				
 			}
-			
+			if (first == 1)
+				first = 0;
 		schedulercnt_2ms = 0;
 	    }
 		

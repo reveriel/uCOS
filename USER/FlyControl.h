@@ -40,7 +40,7 @@ typedef enum {
 }CTRL;
 
 
-void Control(void);
+void Control(int);
 
 
 

@@ -59,7 +59,7 @@ void PWM_Configuration(void){
 	TIM_Cmd(TIM2, ENABLE);
 	TIM_Cmd(TIM3, ENABLE);
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);//使能TIM1的主输出，因为TIM1是高级定时器  所以要这么做
-#ifndef NORMAL
+#ifdef NORMAL
 	PWM2 = 999;
 #endif
 }
@@ -124,7 +124,7 @@ void PWMControl(float PWM[]){
 //	TIM3->CCR1 =PWM[3]>=1000?999:PWM[3];
 	
 	PWM1 = (PWM[0]>=1000?999:PWM[0]);
-#ifdef NORMAL
+#ifndef NORMAL
 	PWM2 = (PWM[1]>=1000?999:PWM[1]);
 #else 
 	PWM2 = 999 - (PWM[1]>=1000?999:PWM[1]);
