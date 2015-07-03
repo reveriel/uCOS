@@ -27,7 +27,7 @@ u8 CtrData;
 
 
 /* test code */
-
+/*
 
 #define TASK1_PRIO 2
 #define TASK1_STACK_SIZE 128
@@ -97,15 +97,14 @@ void task2(void *pdata)
 	}
 }
 
-
-/*
+*/
 
 int main(void)
 {
 
-	int  cnt = 5000;
-	Usart_Configuration();
-	MPU6050_Configuration();
+	int  cnt = 500000;
+//	Usart_Configuration();
+//	MPU6050_Configuration();
 	PWM_Configuration();
 	
 	
@@ -113,29 +112,27 @@ int main(void)
 	
 	CtrData = 1;  
 	
-	
+                         
 	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
 	
 	while (1) {
 		
-		if(schedulercnt_2ms >= 2)
-		{	 
-			cnt--;
-			if (cnt <= 0) {
-				PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0 ;
-				PWMControl(PWM);
-			}
-			
-			READ_MPU6050();
-			Control();
+			 
+		cnt--;
+		if (cnt <= 0) {
+			PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0 ;
 			PWMControl(PWM);
-			
-			schedulercnt_2ms = 0;
-
 		}
+		
+//		READ_MPU6050();
+//		Control();
+		PWMControl(PWM);
+		
+		schedulercnt_2ms = 0;
+
 		
 	}
 	
 }
-*/
+
 
