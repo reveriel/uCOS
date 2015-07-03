@@ -2,7 +2,7 @@
 
 
 
-//#define NORMAL
+#define NORMAL
 
 
 
@@ -49,19 +49,22 @@ void PWM_Configuration(void){
 	TIM_OC2Init(TIM3, &TIM_OCInitStructure);
 	TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
 	TIM_OC1Init(TIM3, &TIM_OCInitStructure);
-	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 	
+	
+TIM_CtrlPWMOutputs(TIM1, ENABLE);//使能TIM1的主输出，因为TIM1是高级定时器  所以要这么做
+
+TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
 	TIM_ARRPreloadConfig(TIM1, ENABLE);
 	TIM_ARRPreloadConfig(TIM2, ENABLE);
 	TIM_ARRPreloadConfig(TIM3, ENABLE);
+	
+	
 	TIM_Cmd(TIM1, ENABLE);	
 	TIM_Cmd(TIM2, ENABLE);
 	TIM_Cmd(TIM3, ENABLE);
-	TIM_CtrlPWMOutputs(TIM1, ENABLE);//使能TIM1的主输出，因为TIM1是高级定时器  所以要这么做
-#ifdef NORMAL
-	PWM2 = 999;
-#endif
+	
+
 }
 
 
@@ -124,11 +127,9 @@ void PWMControl(float PWM[]){
 //	TIM3->CCR1 =PWM[3]>=1000?999:PWM[3];
 	
 	PWM1 = (PWM[0]>=1000?999:PWM[0]);
-#ifndef NORMAL
+
 	PWM2 = (PWM[1]>=1000?999:PWM[1]);
-#else 
-	PWM2 = 999 - (PWM[1]>=1000?999:PWM[1]);
-#endif
+
 	PWM3 =PWM[2]>=1000?999:PWM[2];
 	PWM4 =PWM[3]>=1000?999:PWM[3];
 }
