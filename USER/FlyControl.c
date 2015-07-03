@@ -35,74 +35,9 @@ float CPitch=0;
 float CRoll=0;
 float CYaw=0;
 
-//add by LSY 2015/6/8
-//start
-typedef struct
+void Control()
 {
-	float in, last_in;
-	float out;
-	float state, last_state;
-} Ncell;
 
-Ncell P_input[2];
-Ncell Y_input[2];
-Ncell R_input[2];
-Ncell P_hide[3];
-Ncell Y_hide[3];
-Ncell R_hide[3];
-Ncell P_output[1];
-Ncell Y_output[1];
-Ncell R_output[1];
-float r, y;
-float P_in_hid[2][3];
-float R_in_hid[2][3];
-float Y_in_hid[2][3];
-float P_hid_out[3];
-float Y_hid_out[3];
-float R_hid_out[3];
-int k = 0;
-float P_err_out;
-float P_err_hid[3];
-float Y_err_out;
-float Y_err_hid[3];
-float R_err_out;
-float R_err_hid[3];
-float PID_Pitch_Inital_Value[3];	//wait to set initial value
-float PID_Roll_Inital_Value[3];	//wait to set initial value
-float PID_Yaw_Inital_Value[3];	//wait to set initial value
-float yeta = 0.05;	//study rate
-
-
-void InitNN()
-{
-	int i;
-	for (i = 0; i < 3; i++)
-	{
-		P_in_hid[0][i] = 1;
-		R_in_hid[0][i] = 1;
-		Y_in_hid[0][i] = 1;
-		P_in_hid[1][i] = -1;
-		R_in_hid[1][i] = -1;
-		Y_in_hid[1][i] = -1;
-		P_hid_out[i] = PID_Pitch_Inital_Value[i];
-		Y_hid_out[i] = PID_Pitch_Inital_Value[i];
-		R_hid_out[i] = PID_Pitch_Inital_Value[i];
-	}
-	for (i = 0; i < 3; i++)
-	{
-		P_hide[i].last_state = 0;
-		R_hide[i].last_state = 0;
-		Y_hide[i].last_state = 0;
-		P_hide[i].last_in = 0;
-		R_hide[i].last_in = 0;
-		Y_hide[i].last_in = 0;
-	}
-}
-//end
-void Control(int first)
-{
-	int i, j;
-	int magic_num = 80000;
 	switch(CtrData)
 	{
 	case CTRL_EMPTY://空周期
@@ -144,92 +79,10 @@ void Control(int first)
 	}
 	IMUupdate(GX_F,GY_F,GZ_F,AX_F,AY_F,AZ_F);
 	//IMUupdate(0,0,0,AX_F,AY_F,AZ_F);
-	//FeedBackPitchOut=FeedBack(Pitch-CPitch,1);
-	//FeedBackRollOut=FeedBack(Roll-CRoll,0);
-	//FeedBackYawOut=FeedBack(Yaw-CYaw,2);
-	//add by LSY 2015/6/8
-	//start
-	if (first == 1)
-		InitNN(); //wait---only run once***************************************************
-	P_input[0].in = CPitch;
-	P_input[1].in = Pitch;
-	for (i = 0; i < 2; i++)
-		P_input[i].state = P_input[i].in;
-	for (i = 0; i < 2; i++)
-		P_input[i].out = P_input[i].state;
-	for (i = 0; i < 3; i++)
-	{
-		P_hide[i].in = 0;
-		for (j = 0; j < 2; j++)
-			P_hide[i].in += P_input[j].out * P_in_hid[j][i];
-	}
-	P_hide[0].state = P_hide[0].in;
-	P_hide[1].state = P_hide[1].last_state + P_hide[1].in;
-	P_hide[1].last_state = P_hide[1].state;
-	P_hide[2].state = P_hide[2].in - P_hide[2].last_in;
-	P_hide[2].last_in = P_hide[2].in;
-	for (i = 0; i < 3; i++)
-		P_hide[i].out = P_hide[i].state;
-	P_output[0].in = 0;
-	for (i = 0; i < 3; i++)
-		P_output[0].in += P_hid_out[i] * P_hide[i].out;
-	P_output[0].state = P_output[0].in;
-	P_output[0].out = P_output[0].state;
-	FeedBackPitchOut = P_output[0].out;
-	//
-	Y_input[0].in = CYaw;
-	Y_input[1].in = Yaw;
-	for (i = 0; i < 2; i++)
-		Y_input[i].state = Y_input[i].in;
-	for (i = 0; i < 2; i++)
-		Y_input[i].out = Y_input[i].state;
-	for (i = 0; i < 3; i++)
-	{
-		Y_hide[i].in = 0;
-		for (j = 0; j < 2; j++)
-			Y_hide[i].in += Y_input[j].out * Y_in_hid[j][i];
-	}
-	Y_hide[0].state = Y_hide[0].in;
-	Y_hide[1].state = Y_hide[1].last_state + Y_hide[1].in;
-	Y_hide[1].last_state = Y_hide[1].state;
-	Y_hide[2].state = Y_hide[2].in - Y_hide[2].last_in;
-	Y_hide[2].last_in = Y_hide[2].in;
-	for (i = 0; i < 3; i++)
-		Y_hide[i].out = Y_hide[i].state;
-	Y_output[0].in = 0;
-	for (i = 0; i < 3; i++)
-		Y_output[0].in += Y_hid_out[i] * Y_hide[i].out;
-	Y_output[0].state = Y_output[0].in;
-	Y_output[0].out = Y_output[0].state;
-	FeedBackYawOut = Y_output[0].out;
-	//
-	R_input[0].in = CRoll;
-	R_input[1].in = Roll;
-	for (i = 0; i < 2; i++)
-		R_input[i].state = R_input[i].in;
-	for (i = 0; i < 2; i++)
-		R_input[i].out = R_input[i].state;
-	for (i = 0; i < 3; i++)
-	{
-		R_hide[i].in = 0;
-		for (j = 0; j < 2; j++)
-			R_hide[i].in += R_input[j].out * R_in_hid[j][i];
-	}
-	R_hide[0].state = R_hide[0].in;
-	R_hide[1].state = R_hide[1].last_state + R_hide[1].in;
-	R_hide[1].last_state = R_hide[1].state;
-	R_hide[2].state = R_hide[2].in - R_hide[2].last_in;
-	R_hide[2].last_in = R_hide[2].in;
-	for (i = 0; i < 3; i++)
-		R_hide[i].out = R_hide[i].state;
-	R_output[0].in = 0;
-	for (i = 0; i < 3; i++)
-		R_output[0].in += R_hid_out[i] * R_hide[i].out;
-	R_output[0].state = R_output[0].in;
-	R_output[0].out = R_output[0].state;
-	FeedBackRollOut = R_output[0].out;
-	//
-	//end
+	FeedBackPitchOut=FeedBack(Pitch-CPitch,1);
+	FeedBackRollOut=FeedBack(Roll-CRoll,0);
+	FeedBackYawOut=FeedBack(Yaw-CYaw,2);
+	
 	FeedBackPitchIn=FeedBack(FeedBackPitchOut+GY_F,4);
 	FeedBackRollIn=FeedBack(FeedBackRollOut+GX_F,3);
 	FeedBackYawIn=FeedBack(FeedBackYawOut+GZ_F,5);
@@ -240,54 +93,6 @@ void Control(int first)
 	PWM[1]=InfMax((M+FeedBackRollIn/2+FeedBackYawIn/4)/COS);
 	PWM[2]=InfMax((M-FeedBackRollIn/2+FeedBackYawIn/4)/COS);
 	PWM[3]=InfMax((M+FeedBackPitchIn/2-FeedBackYawIn/4)/COS);
-	PWMControl(PWM);
-	while (magic_num-- > 0)
-	{	;	}
-	//add by LuShiyin 2015/6/2 
-	//start
-	IMUupdate(GX_F, GY_F, GZ_F, AX_F, AY_F, AZ_F);
-	P_err_out = CPitch - Pitch;
-	for (i = 0; i < 3; i++)
-	{
-		P_err_hid[i] = P_hid_out[i] * P_err_out;
-		P_hid_out[i] += yeta*P_hide[i].out*P_err_out;
-	}
-	for (i = 0; i < 2; i++)
-	{
-		for (j = 0; j < 3; j++)
-		{
-			P_in_hid[i][j] += yeta*P_err_hid[j] * P_input[i].out;
-		}
-	}
-	//
-	Y_err_out = CYaw - Yaw;
-	for (i = 0; i < 3; i++)
-	{
-		Y_err_hid[i] = Y_hid_out[i] * Y_err_out;
-		Y_hid_out[i] += yeta*Y_hide[i].out*Y_err_out;
-	}
-	for (i = 0; i < 2; i++)
-	{
-		for (j = 0; j < 3; j++)
-		{
-			Y_in_hid[i][j] += yeta*Y_err_hid[j] * Y_input[i].out;
-		}
-	}
-	//
-	R_err_out = CRoll - Roll;
-	for (i = 0; i < 3; i++)
-	{
-		R_err_hid[i] = R_hid_out[i] * R_err_out;
-		R_hid_out[i] += yeta*R_hide[i].out*R_err_out;
-	}
-	for (i = 0; i < 2; i++)
-	{
-		for (j = 0; j < 3; j++)
-		{
-			R_in_hid[i][j] += yeta*R_err_hid[j] * R_input[i].out;
-		}
-	}
-	//end
 	
 //	PWM[0]=InfMax((M-FeedBackPitchIn)/COS);
 //	PWM[1]=InfMax((M+FeedBackRollIn)/COS);
