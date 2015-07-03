@@ -1,12 +1,6 @@
 #include "include.h"
 #include "includes.h"
 
-#define PWM1(X) TIM2->CCR3 = X
-#define PWM2(X)	TIM2->CCR4 = X
-#define PWM3(X)	TIM1->CCR1 = X
-#define PWM4(X) TIM1->CCR4 = X
-
-
 
 float GX_F, GY_F, GZ_F, T_F, AX_F, AY_F, AZ_F;			// global var ,for mpu6050_read()
 float Roll, Yaw, Pitch;
@@ -22,12 +16,10 @@ u8 CtrData;
 * 3, a task to call IMU
 * 4, a task to print data 
 *
-**************************
-*/
+**************************/
 
 
 /* test code */
-/*
 
 #define TASK1_PRIO 2
 #define TASK1_STACK_SIZE 128
@@ -49,8 +41,10 @@ void startTask(void *pdata);
 int main(void)
 {
 	delay_init();
-	NVIC_Configuration();
-	Usart_Configuration();
+	led_Configuration();
+	MPU6050_Configuration();
+	PWM_Configuration();
+	
 	
 	OSInit();
 	OSTaskCreate(
@@ -84,7 +78,7 @@ void startTask(void *pdata)
 void task1(void *pdata)
 {
 	for (;;) {
-		printf("dhahah   ");
+		LED1_TOGGLE;
 		delay_ms(220);
 	}
 }
@@ -92,13 +86,14 @@ void task1(void *pdata)
 void task2(void *pdata)
 {
 	for (;;) {
-		printf("eeeee   ");
-		delay_ms(223);
+		LED2_TOGGLE;
+		delay_ms(300);
 	}
 }
 
-*/
 
+
+/*
 int main(void)
 {
 
@@ -118,7 +113,6 @@ int main(void)
 	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
 	
 	while (1) {
-		
 			 
 		cnt--;
 		if (cnt <= 0) {
@@ -144,5 +138,5 @@ int main(void)
 	}
 	
 }
-
+*/
 
