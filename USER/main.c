@@ -104,13 +104,13 @@ int main(void)
 
 	int  cnt = 500000;
 //	Usart_Configuration();
-//	MPU6050_Configuration();
+	MPU6050_Configuration();
 	PWM_Configuration();
 	
 	
 	SysTick_Config(SystemCoreClock / 1000); // ms
 	
-	CtrData = 1;  
+	CtrData = 1;
 	
                          
 	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
@@ -124,8 +124,8 @@ int main(void)
 			PWMControl(PWM);
 		}
 		
-//		READ_MPU6050();
-//		Control();
+		READ_MPU6050();
+		Control();
 		PWMControl(PWM);
 		
 		schedulercnt_2ms = 0;

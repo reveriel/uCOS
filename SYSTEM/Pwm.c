@@ -90,7 +90,7 @@ void PWM_Configuration(void){
 //	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 //	TIM_OCInitStructure.TIM_Pulse = 0;//初始占空比为0
 //	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-//	
+
 
 //	TIM_OC3Init(TIM2, &TIM_OCInitStructure);
 //	TIM_OC3PreloadConfig(TIM2, TIM_OCPreload_Enable);
@@ -105,7 +105,7 @@ void PWM_Configuration(void){
 //	TIM_Cmd(TIM1, ENABLE);	
 //	TIM_Cmd(TIM2, ENABLE);
 //	TIM_CtrlPWMOutputs(TIM1, ENABLE);//使能TIM1的主输出，因为TIM1是高级定时器  所以要这么做
-//	
+
 //}
 
 void PWMControl(float PWM[]){
