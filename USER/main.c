@@ -45,7 +45,7 @@ OS_STK mpu6050Stack[MPU6050_READ_STACK_SIZE];
 void mpu6050Read(void *pdata);
 
 
-
+/*
 
 int main(void)
 {
@@ -76,11 +76,11 @@ void startTask(void *pdata)
 		&task1Stack[TASK1_STACK_SIZE - 1],
 		TASK1_PRIO);
 		
-	OSTaskCreate(
-		task2,
-		(void *)0,
-		&task2Stack[TASK2_STACK_SIZE - 1],
-		TASK2_PRIO);
+//	OSTaskCreate(
+//		task2,
+//		(void *)0,
+//		&task2Stack[TASK2_STACK_SIZE - 1],
+//		TASK2_PRIO);
 		
 	OSTaskSuspend(START_TASK_PRIO);
 	OS_EXIT_CRITICAL();
@@ -91,23 +91,22 @@ void task1(void *pdata)
 	
 
 	for (;;) {
-//		cnt--;
-//		if (cnt < 0) {
-//			for (;;) {
-//				CtrData = CTRL_STOP;
-//				Control();
-//			}
-//		}
-//		LED1_TOGGLE;
-//		
-//		CtrData = CTRL_UP;
-//		READ_MPU6050();
-//		Control();
+		cnt--;
+		if (cnt < 0) {
+			for (;;) {
+				CtrData = CTRL_EMPTY;
+				Control();
+			}
+		}
 		LED1_TOGGLE;
-		PWM[0] = PWM[1] = PWM[2] = PWM[3] = 100;
-		PWMControl(PWM);
+		
+		CtrData = CTRL_UP;
+		READ_MPU6050();
+		Control();
+		LED1_TOGGLE;
+//		PWM[0] = PWM[1] = PWM[2] = PWM[3] = 100;
+//		PWMControl(PWM);
 		OSTimeDly(220);
-//		delay_ms(220);
 	}
 }
 
@@ -118,56 +117,63 @@ void task2(void *pdata)
 		PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0;
 		PWMControl(PWM);
 		OSTimeDly(300);
-//		delay_ms(300);
 	}
 }
 
+*/
 
 
-/*
 int main(void)
 {
 
-	int led_loop = 50000;
-	int  cnt = 500000;
+	int i = 100000000;
+	int j = 10000000;
+	int  cnt = 1000;
+	delay_init();
+
 	led_Configuration();
-//	Usart_Configuration();
 	MPU6050_Configuration();
 	PWM_Configuration();
 	
+//	SysTick_Config(SystemCoreClock / 1000); // ms
 	
-	SysTick_Config(SystemCoreClock / 1000); // ms
+	CtrData = CTRL_UP;
 	
-	CtrData = 1;
-	
-                         
-	PWM[0] = PWM[1] = PWM[2] = PWM[3] = 700;
-	
+	while (i-- > 0) {
+		while (j-- > 0) {
+			;
+		}
+	}
 	while (1) {
-			 
-		cnt--;
-		if (cnt <= 0) {
-			PWM[0] = PWM[1] = PWM[2] = PWM[3] = 0 ;
-			PWMControl(PWM);
-		}
 		
-		READ_MPU6050();
-//		Control();
-//		PWMControl(PWM);
+		
+		if(schedulercnt_2ms >= 2)
+		{	 
+			if (cnt > 0)
+			{
+				//读加速度计和陀螺仪数据
+				READ_MPU6050();
+					//飞控函数
+				Control();
+				//PWM波输出函数
+				PWMControl(PWM);
+				cnt--;
+			}
+			else {
+				CtrData = CTRL_STOP;
+				Control();
+				PWMControl(PWM);
+				
+			}
+			
 		schedulercnt_2ms = 0;
+	    }
 		
-		led_loop--;
-		if (led_loop == 0) {
-			GPIO_SetBits(GPIOB, GPIO_Pin_1);
-			led_loop = 50000 * 2;
-		}
-		if (led_loop == 50000) {
-			GPIO_ResetBits(GPIOB, GPIO_Pin_1);
-		}
 
 		
 	}
 	
 }
-*/
+
+
 

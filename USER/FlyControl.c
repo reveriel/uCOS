@@ -38,8 +38,6 @@ float CYaw=0;
 void Control()
 {
 
-
-
 	switch(CtrData)
 	{
 	case CTRL_EMPTY://空周期
@@ -63,10 +61,8 @@ void Control()
 		{
 			while(1)
 			{
-				PWM1 = 0;
-				PWM2 = 0;
-				PWM3 = 0;
-				PWM4 = 0;
+				PWM[0]=PWM[1]=PWM[2]=PWM[3]=0;
+				PWMControl(PWM);
 			}
 		}
 		break;
@@ -76,10 +72,8 @@ void Control()
 	case CTRL_STOP://停止
 		while(1)
 		{
-			PWM1 = 0;
-			PWM2 = 0;
-			PWM3 = 0;
-			PWM4 = 0;
+			PWM[0]=PWM[1]=PWM[2]=PWM[3]=0;
+			PWMControl(PWM);
 		}
 		break;
 	}

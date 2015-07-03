@@ -137,10 +137,10 @@ void DebugMon_Handler(void)
   * @param  None
   * @retval None
   */
-//void SysTick_Handler(void)
-//{
-//	SysTick_IRQ();
-//}
+void SysTick_Handler(void)
+{
+	SysTick_IRQ();
+}
 
 /******************************************************************************/
 /*                 STM32F10x Peripherals Interrupt Handlers                   */
