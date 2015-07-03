@@ -102,7 +102,9 @@ void task2(void *pdata)
 int main(void)
 {
 
+	int led_loop = 50000;
 	int  cnt = 500000;
+	led_Configuration();
 //	Usart_Configuration();
 	MPU6050_Configuration();
 	PWM_Configuration();
@@ -125,10 +127,18 @@ int main(void)
 		}
 		
 		READ_MPU6050();
-		Control();
-		PWMControl(PWM);
-		
+//		Control();
+//		PWMControl(PWM);
 		schedulercnt_2ms = 0;
+		
+		led_loop--;
+		if (led_loop == 0) {
+			GPIO_SetBits(GPIOB, GPIO_Pin_1);
+			led_loop = 50000 * 2;
+		}
+		if (led_loop == 50000) {
+			GPIO_ResetBits(GPIOB, GPIO_Pin_1);
+		}
 
 		
 	}
