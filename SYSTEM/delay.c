@@ -38,12 +38,12 @@ void SysTick_Handler(void)
 	OSIntEnter();		//进入中断
     OSTimeTick();       //调用ucos的时钟服务程序               
     OSIntExit();        //触发任务切换软中断
-	sysTickUptime++;
-	schedulercnt_1ms++;
-	schedulercnt_2ms++;
-	schedulercnt_5ms++;
-	schedulercnt_10ms++;
-	schedulercnt_20ms++;
+//	sysTickUptime++;
+//	schedulercnt_1ms++;
+//	schedulercnt_2ms++;
+//	schedulercnt_5ms++;
+//	schedulercnt_10ms++;
+//	schedulercnt_20ms++;
 }
 
 #else
@@ -64,19 +64,21 @@ void delay_init()
 	u32 reload;
 #endif
 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);	//选择外部时钟  HCLK/8
-	fac_us=SystemCoreClock/8000000;	//为系统时钟的1/8  
-	 
-#ifdef OS_CRITICAL_METHOD 	//如果OS_CRITICAL_METHOD定义了,说明使用ucosII了.
-	reload=SystemCoreClock/8000000;		//每秒钟的计数次数 单位为K	   
-	reload*=1000000/OS_TICKS_PER_SEC;//根据OS_TICKS_PER_SEC设定溢出时间
-							//reload为24位寄存器,最大值:16777216,在72M下,约合1.86s左右	
-	fac_ms=1000/OS_TICKS_PER_SEC;//代表ucos可以延时的最少单位	   
-	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;   	//开启SYSTICK中断
-	SysTick->LOAD=reload; 	//每1/OS_TICKS_PER_SEC秒中断一次	
-	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;   	//开启SYSTICK    
-#else
-	fac_ms=(u16)fac_us*1000;//非ucos下,代表每个ms需要的systick时钟数   
-#endif
+//	fac_us=SystemCoreClock/8000000;	//为系统时钟的1/8  
+//	 
+//#ifdef OS_CRITICAL_METHOD 	//如果OS_CRITICAL_METHOD定义了,说明使用ucosII了.
+//	reload=SystemCoreClock/8000000;		//每秒钟的计数次数 单位为K	   
+//	reload*=1000000/OS_TICKS_PER_SEC;//根据OS_TICKS_PER_SEC设定溢出时间
+//							//reload为24位寄存器,最大值:16777216,在72M下,约合1.86s左右	
+//	fac_ms=1000/OS_TICKS_PER_SEC;//代表ucos可以延时的最少单位	   
+//	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;   	//开启SYSTICK中断
+//	SysTick->LOAD=reload; 	//每1/OS_TICKS_PER_SEC秒中断一次	
+//	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk;   	//开启SYSTICK    
+//#else
+//	fac_ms=(u16)fac_us*1000;//非ucos下,代表每个ms需要的systick时钟数   
+//#endif
+//	
+	SysTick_Config(SystemCoreClock / 1000); // ms
 }								    
 
 #ifdef OS_CRITICAL_METHOD	//使用了ucos
