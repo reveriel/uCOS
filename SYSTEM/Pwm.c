@@ -1,6 +1,12 @@
 #include "Pwm.h"
 
 
+
+
+
+
+
+
 void PWM_Configuration(void){
 	
 	uint16_t PrescalerValue = 0;
@@ -110,9 +116,14 @@ void PWM_Configuration(void){
 
 void PWMControl(float PWM[]){
 	
-	TIM2->CCR1 =PWM[0]*1.08>=1000?999:PWM[0]*1.08;
-	TIM1->CCR1 =PWM[1]*1.01>=1000?999:PWM[1]*1.01;
-	TIM3->CCR2 =PWM[2]>=1000?999:PWM[2];
-	TIM3->CCR1 =PWM[3]>=1000?999:PWM[3];
+//	TIM2->CCR1 =PWM[0]*1.08>=1000?999:PWM[0]*1.08;
+//	TIM1->CCR1 =PWM[1]*1.01>=1000?999:PWM[1]*1.01;
+//	TIM3->CCR2 =PWM[2]>=1000?999:PWM[2];
+//	TIM3->CCR1 =PWM[3]>=1000?999:PWM[3];
+	
+	PWM1 =PWM[0]*1.08>=1000?999:PWM[0]*1.08;
+	PWM2 =PWM[1]*1.01>=1000?999:PWM[1]*1.01;
+	PWM3 =PWM[2]>=1000?999:PWM[2];
+	PWM4 =PWM[3]>=1000?999:PWM[3];
 }
 

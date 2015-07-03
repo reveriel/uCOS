@@ -28,6 +28,16 @@
 
 #define CtrSize 0.02
 
+typedef enum { 
+	CTRL_EMPTY,
+	CTRL_PITCH_UP,
+	CTRL_PITCH_DOWN,
+	CTRL_ROLL_LEFT,
+	CTRL_ROLL_RIGHT,
+	CTRL_UP,
+	CTRL_DOWN,
+	CTRL_STOP
+}CTRL;
 
 
 void Control(void);

@@ -1,5 +1,12 @@
 #include "include.h"
 #include "FlyControl.h"
+#include "Pwm.h"
+
+
+
+
+
+
 
 
 /**** int main.c ****/
@@ -32,44 +39,44 @@ void Control()
 
 	switch(CtrData)
 	{
-	case 0:
+	case CTRL_EMPTY://空周期
 		;
 		break;
-	case 1:
-		CPitch+=CtrSize;
+	case CTRL_PITCH_UP:
+		CPitch+=CtrSize;//俯仰，机头抬升
 		break;
-	case 2:
-		CPitch-=CtrSize;
+	case CTRL_PITCH_DOWN:
+		CPitch-=CtrSize;//俯仰，机头下降
 		break;
-	case 3:
-		CRoll+=CtrSize;
+	case CTRL_ROLL_LEFT:
+		CRoll+=CtrSize;//横滚，偏左
 		break;
-	case 4:
-		CRoll-=CtrSize;
+	case CTRL_ROLL_RIGHT:
+		CRoll-=CtrSize;//横滚，偏右
 		break;
-	case 5:
-		M+=CtrSize;
+	case CTRL_UP:
+		M+=CtrSize;//马力增加，抬升
 		if(M>=950)
 		{
 			while(1)
 			{
-				TIM2->CCR3 = 0;
-				TIM2->CCR4 = 0;
-				TIM1->CCR1 = 0;
-				TIM1->CCR4 = 0;
+				PWM1 = 0;
+				PWM2 = 0;
+				PWM3 = 0;
+				PWM4 = 0;
 			}
 		}
 		break;
-	case 6:
-		M-=CtrSize;
+	case CTRL_DOWN:
+		M-=CtrSize;//马力减小，下降
 		break;
-	case 7:
+	case CTRL_STOP://停止
 		while(1)
 		{
-			TIM2->CCR3 = 0;
-			TIM2->CCR4 = 0;
-			TIM1->CCR1 = 0;
-			TIM1->CCR4 = 0;
+			PWM1 = 0;
+			PWM2 = 0;
+			PWM3 = 0;
+			PWM4 = 0;
 		}
 		break;
 	}

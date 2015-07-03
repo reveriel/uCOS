@@ -21,6 +21,7 @@ u8 CtrData;
 
 /* test code */
 
+
 #define TASK1_PRIO 2
 #define TASK1_STACK_SIZE 128
 OS_STK task1Stack[TASK1_STACK_SIZE];
@@ -35,6 +36,12 @@ void task2(void *pdata);
 #define START_TASK_STACK_SIZE 128
 OS_STK startTaskStack[START_TASK_STACK_SIZE];
 void startTask(void *pdata);
+
+#define MPU6050_READ_PRIO  12
+#define MPU6050_READ_STACK_SIZE 128
+OS_STK mpu6050Stack[MPU6050_READ_STACK_SIZE];
+void mpu6050Read(void *pdata);
+
 
 
 
@@ -66,19 +73,34 @@ void startTask(void *pdata)
 		(void *)0,
 		&task1Stack[TASK1_STACK_SIZE - 1],
 		TASK1_PRIO);
-	OSTaskCreate(
-		task2,
-		(void *)0,
-		&task2Stack[TASK2_STACK_SIZE - 1],
-		TASK2_PRIO);
+//		
+//	OSTaskCreate(
+//		task2,
+//		(void *)0,
+//		&task2Stack[TASK2_STACK_SIZE - 1],
+//		TASK2_PRIO);
+		
 	OSTaskSuspend(START_TASK_PRIO);
 	OS_EXIT_CRITICAL();
 }
 	
 void task1(void *pdata)
 {
+	
+	int cnt = 10;
 	for (;;) {
+		cnt--;
+		if (cnt < 0) {
+			for (;;) {
+				CtrData = CTRL_STOP;
+				Control();
+			}
+		}
 		LED1_TOGGLE;
+		
+		CtrData = CTRL_UP;
+		READ_MPU6050();
+		Control();
 		delay_ms(220);
 	}
 }
@@ -87,6 +109,8 @@ void task2(void *pdata)
 {
 	for (;;) {
 		LED2_TOGGLE;
+		PWM[0] = PWM[1] = PWM[2] = PWM[3] = 50;
+		PWMControl(PWM);
 		delay_ms(300);
 	}
 }

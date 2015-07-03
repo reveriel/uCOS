@@ -21,6 +21,7 @@ void led_Configuration(void);
 #define LED1_ON			digitalLo(GPIOB,GPIO_Pin_1)
 
 #define LED2_TOGGLE		digitalToggle(GPIOB,GPIO_Pin_12)
+#define LED2_OFF		digitalHi(GPIOB,GPIO_Pin_12)
 #define LED2_ON			digitalLo(GPIOB,GPIO_Pin_12)
 
 #endif
