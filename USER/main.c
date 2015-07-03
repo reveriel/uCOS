@@ -8,6 +8,8 @@ float PWM[4];
 
 u8 CtrData;		
 
+int cnt = 10;
+	
 /*************************
 * OS task 
 * 1. a task to initiate all hardware
@@ -87,7 +89,7 @@ void startTask(void *pdata)
 void task1(void *pdata)
 {
 	
-	int cnt = 10;
+
 	for (;;) {
 		cnt--;
 		if (cnt < 0) {

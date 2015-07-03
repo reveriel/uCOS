@@ -1,9 +1,6 @@
 #include "SysTick.h"
 
-// cycles per microsecond
-static volatile uint32_t usTicks = 0;
-// 滴答定时器计数变量 ,49天后溢出
-static volatile uint32_t sysTickUptime = 0;
+
 
 u8 schedulercnt_1ms=0;
 u8 schedulercnt_2ms=0;

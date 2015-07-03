@@ -30,12 +30,15 @@ float deltaT;
 *  CtrData 
 *  data from MPU, 
 */
+
+float CPitch=0;
+float CRoll=0;
+float CYaw=0;
+
 void Control()
 {
 
-	float CPitch=0;
-	float CRoll=0;
-	float CYaw=0;
+
 
 	switch(CtrData)
 	{

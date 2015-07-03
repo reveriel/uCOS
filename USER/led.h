@@ -25,3 +25,4 @@ void led_Configuration(void);
 #define LED2_ON			digitalLo(GPIOB,GPIO_Pin_12)
 
 #endif
+

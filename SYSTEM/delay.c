@@ -1,5 +1,7 @@
 #include "delay.h"
 #include "sys.h"
+#include "SysTick.h"
+
 ////////////////////////////////////////////////////////////////////////////////// 	 
 //如果使用ucos,则包括下面的头文件即可.
 #if SYSTEM_SUPPORT_UCOS
@@ -36,6 +38,12 @@ void SysTick_Handler(void)
 	OSIntEnter();		//进入中断
     OSTimeTick();       //调用ucos的时钟服务程序               
     OSIntExit();        //触发任务切换软中断
+	sysTickUptime++;
+	schedulercnt_1ms++;
+	schedulercnt_2ms++;
+	schedulercnt_5ms++;
+	schedulercnt_10ms++;
+	schedulercnt_20ms++;
 }
 
 #else
